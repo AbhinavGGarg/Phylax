@@ -5,13 +5,13 @@
 Phylax is a privacy-preserving, real-time **collective campaign-containment network**. A bank, a marketplace, and a messaging platform each see a weak, non-actionable fragment of an emerging scam. Phylax lets them *prove a coordinated campaign together* — without exposing customer identities, raw messages, private watchlists, or embeddings — and coordinate the smallest safe, human-approved intervention.
 
 > Built for the **Bay Builders Hackathon** ("Build your own AI company"), targeting **Best Use of InsForge**.
-> InsForge is the operating system; **SecretFlow** performs the privacy-preserving computation.
+> InsForge is the operating system for the entire product; the privacy-preserving computation is Phylax's own.
 
 ### ▶ Live demo — **https://kd6vibk3.insforge.site**
 
 The whole product runs on InsForge: the frontend is served from **InsForge Sites**, and clicking **Run Protected Sweep** ([/console.html](https://kd6vibk3.insforge.site/console.html)) executes the **real** DDH-PSI + secure aggregation + risk model inside an **InsForge Edge Function** (`demo-sweep`), writing through the live Postgres state machine. No server of ours, no local process — just InsForge. (Pages: [landing](https://kd6vibk3.insforge.site/), [console](https://kd6vibk3.insforge.site/console.html), [architecture](https://kd6vibk3.insforge.site/architecture.html), [sponsor](https://kd6vibk3.insforge.site/sponsor.html), [partner RLS view](https://kd6vibk3.insforge.site/partner.html).)
 
-> The hosted edge compute uses the standard **RFC 2409 1024-bit MODP** safe prime for edge-function latency (~1.3 s/sweep) — the same DDH-PSI protocol; the repo's local Python backend uses full **2048-bit MODP**, and production uses **SecretFlow SPU** ECDH-PSI.
+> The hosted edge compute uses the standard **RFC 2409 1024-bit MODP** safe prime for edge-function latency (~1.3 s/sweep); the repo's local Python backend uses the full **2048-bit MODP** group — the same DDH-PSI protocol.
 
 ---
 
@@ -39,7 +39,7 @@ No raw record ever entered a neutral database. The match happened in **Private S
 
 Phylax is deliberately honest about the demo-vs-production boundary.
 
-- ✅ **The privacy-preserving computation is real.** Private Set Intersection and secure aggregation actually run — they are not a loading spinner. The local backend runs a genuine 2048-bit **MODP Decisional-Diffie-Hellman PSI** (the same cryptographic family as SecretFlow's `ECDH_PSI_3PC`); the production party services run **SecretFlow SPU** ECDH-PSI. We prove in tests that the coordinator never sees a single non-matching token.
+- ✅ **The privacy-preserving computation is real.** Private Set Intersection and secure aggregation actually run — they are not a loading spinner. Phylax runs a genuine 2048-bit **MODP Decisional-Diffie-Hellman PSI** (1024-bit on the hosted edge for latency), with OPRF-keyed tokenization and additive-secret-sharing secure aggregation. We prove in tests that the coordinator never sees a single non-matching token.
 - ✅ **The risk model is a real trained model** — a logistic regression over five aggregate features (`params_hash` verifies it reproduces from seed). It is **not** an LLM and **not** a random score. There is no chatbot anywhere in Phylax.
 - ✅ **The InsForge control plane is live and load-bearing.** Postgres + RLS + a server-enforced monotonic state machine + append-only audit + 8 Edge Functions + Realtime + private Storage, deployed to a real InsForge project (`kd6vibk3`). Clicking "Run Protected Sweep" invokes the real orchestration path; the UI updates from actual backend state and Realtime events.
 - ⚠️ **The demo uses synthetic data and a single-account topology.** All party services run in one host/account. This is a **functional demonstration**, not proof of adversarial infrastructure isolation. In production each organization runs its own InsForge project, its own party compute service, and its own key material (see [Security model](#security-model--limitations)).
@@ -60,7 +60,7 @@ Phylax is deliberately honest about the demo-vs-production boundary.
  │  • party     │   │  • party     │   │  • party     │    ║   findings    │  Realtime (safe events)   │
  │    agent ────┼───┼──── agent ───┼───┼──── agent    │    ║   ───────────▶│  private Storage          │
  └──────┬───────┘   └──────┬───────┘   └──────┬───────┘    ║   proof       │  append-only audit ledger │
-        │     SecretFlow / DDH PSI  +  secure agg          ║   hashes      └───────────────────────────┘
+        │     DDH-PSI + OPRF + secure aggregation          ║   hashes      └───────────────────────────┘
         └───────────────── coordinator ───────────────────╫──────────────▶  receive-worker-callback (HMAC)
                                                            ║
    Raw messages, identities, account numbers, watchlists, embeddings  →  NEVER cross the membrane.
@@ -93,21 +93,20 @@ InsForge is not used for auth-and-deploy convenience; it is structurally indispe
 | **Edge Functions** | 8 functions form the entire control-plane API. `receive-worker-callback` verifies HMAC over the exact signed string, enforces a timestamp window, a single-use **nonce** ledger (replay protection), a forbidden-field scan, and legal state. |
 | **Realtime** | Live incident timeline on `run:<id>` / `org:<id>` channels with **subscription RLS**. Payloads carry only safe metadata — a test asserts no prohibited field ever appears. |
 | **Storage** | Private `phylax-artifacts` bucket for signed run reports / receipts. The control tables store references + checksums, never raw evidence. |
-| **Custom Compute** | The Dockerized SecretFlow party services / coordinator (see `parties/`, `docker-compose.yml`, `docs/deploy-compute.md`). |
+| **Custom Compute** | The Dockerized party compute services / coordinator (see `parties/`, `docker-compose.yml`, `docs/deploy-compute.md`). |
 | **Backend Branching** | Documented schema-only security-branch workflow for applying RLS/trigger/function changes safely (`docs/backend-branching.md`). |
 | **Sites** | Frontend deploy target (`npx @insforge/cli deployments deploy web`). |
 
-## SecretFlow feature map
+## Privacy-preserving computation
 
-| SecretFlow capability | Role in Phylax |
+The protected computation is Phylax's own — and it actually runs (no LLM, no random score, no loading timer).
+
+| Primitive | Role in Phylax |
 |---|---|
-| **ECDH Private Set Intersection** (`ECDH_PSI_3PC`) | The protected cross-party match over opaque campaign tokens. Production backend (`parties/common/psi_secretflow.py`, pinned `secretflow==1.10.0b1`). |
-| **Secure aggregation** | Permitted aggregate features (`total_events`, `mean_velocity_z`, `temporal_alignment`) computed via additive secret sharing — no party's individual value is revealed. |
-| **Federated numeric model** | A real logistic-regression risk score over the aggregate features (not an LLM, not random). |
-
-> The default local backend (`parties/common/psi.py`) implements the **same DDH commutative-encryption protocol** in pure Python so the demo runs anywhere; set `PHYLAX_PSI_BACKEND=secretflow` in a party service that has SecretFlow installed to route through SPU. Results are identical.
-
-SecretFlow is a dependency, not a fork. See [`NOTICE`](NOTICE) for its Apache-2.0 attribution.
+| **DDH Private Set Intersection** (multiparty commutative encryption) | The protected cross-party match over opaque campaign tokens. Full 2048-bit MODP locally (`parties/common/psi.py`); RFC 2409 1024-bit MODP on the hosted edge (`insforge/functions/_shared/psi_core.js`). Non-matching elements are hidden by the DDH assumption. |
+| **OPRF tokenization** | A 2HashDH oblivious PRF keyed by a jointly-governed key turns raw observations into opaque campaign signatures — not a plain hash of a low-entropy identifier. |
+| **Secure aggregation** | Permitted aggregate features (`total_events`, `mean_velocity_z`, `temporal_alignment`) via additive secret sharing — no party's individual value is revealed. |
+| **Federated numeric model** | A real trained logistic-regression risk score over the aggregate features (not an LLM, not random). |
 
 ---
 
@@ -128,7 +127,7 @@ Pages:
 - `/` — landing (the pitch)
 - `/console` — the operator command center
 - `/partner` — a partner-restricted view (live RLS isolation)
-- `/architecture` — the InsForge + SecretFlow design
+- `/architecture` — the InsForge + privacy-preserving-compute design
 - `/sponsor` — why this is built natively on InsForge
 
 ### Run the real computation from the CLI
@@ -175,7 +174,7 @@ npx @insforge/cli deployments deploy web
 
 `.env.local` is generated with the project's base URL, API key, anon key, and freshly-generated `WORKER_HMAC_SECRET` / `RECEIPT_SIGNING_KEY` / `PHYLAX_JOINT_SECRET`. See [`.env.example`](.env.example) for the shape. **Never commit `.env.local` or `.insforge/`.**
 
-The SecretFlow party services deploy to **InsForge Custom Compute** — see [`docs/deploy-compute.md`](docs/deploy-compute.md).
+The party compute services deploy to **InsForge Custom Compute** — see [`docs/deploy-compute.md`](docs/deploy-compute.md).
 
 ---
 
@@ -208,7 +207,7 @@ Screenshots referenced by this README live in `docs/assets/`. To capture a GIF o
 
 ## Security model & limitations
 
-- **PSI/MPC execution is real.** DDH-PSI (local) and SecretFlow SPU ECDH-PSI (production) are genuine protocols; non-matching elements are hidden by the DDH assumption.
+- **PSI/MPC execution is real.** The MODP DDH-PSI is a genuine protocol (multiparty commutative encryption); non-matching elements are hidden by the DDH assumption.
 - **Signatures & tokenization.** Campaign signatures are prepared with a **2HashDH OPRF** keyed by a jointly-governed key — *not* a plain SHA-256 of a low-entropy identifier. What the neutral plane stores is a **hiding commitment** to each token, so it cannot join partners itself.
 - **Local vectors are optional and not built for the demo.** The partner-side pgvector pipeline (local scam-variant clustering to form a candidate signature) is a documented, feature-flagged production component. It is not exercised here; the demo's real path is the PSI/MPC match over opaque tokens. Embeddings never enter the neutral plane in either mode.
 - **Demo vs production trust boundary.** The demo runs all party services in one account: a functional demonstration, **not** adversarial isolation. Production requires each organization to run its own InsForge project + party service + independent key material, with the OPRF key jointly governed / threshold, and per-org Ed25519 signing (the demo uses shared HMAC secrets, same wire format).
@@ -233,7 +232,7 @@ We deliberately did **not** bolt on unrelated sponsor SDKs (search, memory, etc.
 
 > Scam rings are cross-platform, but the platforms are siloed. Your bank sees a weird payout, a marketplace sees a shady seller, a messaging app sees a link burst — each one, alone, is below the bar to act. They can't pool raw data: it's illegal, unsafe, and a privacy nightmare. So the rings win.
 > Phylax is the neutral network that lets them prove the campaign *together* without sharing anything. Real cryptography — private set intersection and secure aggregation — finds the coordination across all three, a trained model scores it, and a human approves the smallest safe action. The neutral control plane stores zero raw records; it's all on a signed, immutable ledger.
-> It's built natively on InsForge — auth, an isolated Postgres control plane, long-running compute, realtime, storage, and a tamper-evident audit trail — with SecretFlow doing the private math. A privacy-security company, not a CRUD app.
+> It's built natively on InsForge — auth, an isolated Postgres control plane, long-running compute, realtime, storage, and a tamper-evident audit trail — with real cryptography doing the private math. A privacy-security company, not a CRUD app.
 
 ## 90-second demo script
 
@@ -257,7 +256,7 @@ phylax/
   migrations/            6 InsForge migrations (schema, state machine, RLS, realtime, seed, infra)
   insforge/functions/    8 edge functions (src/ + _shared/core.ts → _dist/ inlined for deploy)
   parties/               real privacy-preserving compute
-    common/              mpc_group · signatures(OPRF) · psi(DDH) · psi_secretflow(SPU) · secure_agg · risk_model · signing
+    common/              mpc_group · signatures(OPRF) · psi(DDH) · secure_agg · risk_model · signing
     coordinator.py       orchestrates a protected sweep → signed callbacks
     data/                synthetic per-org datasets (one shared campaign + noise)
     party_service.py     FastAPI party agent  ·  coordinator_service.py  ·  Dockerfile.*  (Custom Compute)
@@ -271,4 +270,4 @@ phylax/
 
 ## License
 
-Phylax's own code is MIT. It **depends on** [SecretFlow](https://github.com/secretflow/secretflow) (Apache-2.0) — see [`NOTICE`](NOTICE).
+Phylax is MIT licensed.
