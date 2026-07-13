@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>ΦYLAX · Architecture</title>
+<style>
+*{box-sizing:border-box;margin:0}
+html{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased}
+body{background:#F8F9FB;color:#0A0A1A;font-size:15px;line-height:1.6;letter-spacing:-.01em}
+.nav-bar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,.06)}
+.nav-in{max-width:1160px;margin:0 auto;padding:12px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.nav-l{display:flex;align-items:center;gap:14px}
+.logo{display:inline-flex;align-items:center;gap:.35ch;font-weight:730;font-size:21px;color:#0A0A1A;text-decoration:none}
+.logo .s{font-family:'JetBrains Mono',monospace;color:#1E2DFF;font-weight:600}
+.nav-tag{font-size:13px;color:#999AA8;border-left:1px solid rgba(0,0,0,.06);padding-left:14px}
+.nav-links{display:flex;gap:1px}
+.nav-links a{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.05em;color:#555566;padding:7px 11px;border-radius:4px;text-decoration:none;text-transform:uppercase;transition:.15s}
+.nav-links a:hover{color:#0A0A1A;background:rgba(0,0,0,.04)}
+.nav-links a.act{color:#1E2DFF;background:#EEF0FF;font-weight:520}
+.wrap{max-width:1160px;margin:0 auto;padding:0 28px}
+.sec{padding:80px 0}.sec+.sec{border-top:1px solid rgba(0,0,0,.06)}
+.hd{margin-bottom:32px}
+.hd .eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#999AA8;display:block;margin-bottom:8px}
+.hd h2{font-size:clamp(23px,2.8vw,34px);font-weight:650;letter-spacing:-.025em;margin-bottom:10px}
+.hd p{font-size:16px;color:#555566;line-height:1.6;max-width:60ch}
+.p{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);overflow:hidden}
+.p-pd{padding:20px 24px}
+.p-hd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-bottom:1px solid rgba(0,0,0,.06);font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8;text-transform:uppercase;letter-spacing:.06em}
+.tag{display:inline-flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.04em;padding:3px 8px;border-radius:4px;border:1px solid rgba(0,0,0,.1);color:#555566;text-transform:uppercase}
+.tag.b{color:#1E2DFF;border-color:rgba(30,45,255,.2);background:#EEF0FF}
+.tag.a{color:#CC6C00;border-color:rgba(204,108,0,.2);background:rgba(204,108,0,.06)}
+.head{padding:clamp(42px,6vw,76px) 0 6px}
+.head h1{font-size:clamp(32px,5vw,56px);font-weight:660;letter-spacing:-.04em;line-height:1}
+.diagram{padding:14px}.diagram svg{width:100%;min-width:800px;height:auto;display:block}
+.leg{display:flex;flex-wrap:wrap;gap:8px 20px;padding:14px 4px 0;border-top:1px solid rgba(0,0,0,.06);margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8}
+.leg i{display:flex;align-items:center;gap:7px;font-style:normal}
+.leg .ln{width:20px;height:0;border-top:1.5px solid #1E2DFF}
+.leg .ln.d{width:20px;height:0;border-top:1.5px dashed rgba(30,45,255,.4)}
+.leg .sq{width:9px;height:9px;border-radius:2px;background:#DC2626}
+.map{display:grid;grid-template-columns:190px 1fr}
+.map dt{font-family:'JetBrains Mono',monospace;font-size:12px;color:#1E2DFF;padding:16px 18px 16px 0;border-top:1px solid rgba(0,0,0,.06)}
+.map dd{margin:0;padding:16px 0;border-top:1px solid rgba(0,0,0,.06);font-size:13.5px;color:#555566;line-height:1.55}
+.map dd b,.map dd .m{color:#0A0A1A}.map dd .m{font-family:'JetBrains Mono',monospace;font-size:11.5px}
+.pil{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10px;color:#1E2DFF;border:1px solid rgba(30,45,255,.2);background:#EEF0FF;border-radius:4px;padding:1px 6px;margin:1px 3px 1px 0}
+.s2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.s2 ul{list-style:none;padding:16px 18px}
+.s2 li{position:relative;padding:7px 0 7px 20px;font-size:13px;color:#555566;line-height:1.5;border-bottom:1px dashed rgba(0,0,0,.06)}
+.s2 li:last-child{border-bottom:0}
+.s2 li:before{content:"";position:absolute;left:0;top:11px;width:7px;height:7px;border-radius:2px}
+.s2 .d li:before{background:#CC6C00}.s2 .p li:before{background:#1E2DFF}.s2 li b{color:#0A0A1A;font-weight:600}
+.chk{display:grid;grid-template-columns:1fr 1fr;gap:12px 40px}
+.chk ul{list-style:none;padding:0}
+.chk li{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(0,0,0,.06);font-size:13px;color:#0A0A1A}
+.chk li .ic{font-family:'JetBrains Mono',monospace;flex-shrink:0;font-size:14px}
+.chk .w li{color:#555566}
+.chk h4{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#999AA8;margin-bottom:6px}
+.cta-blk{text-align:center;padding:80px 0}
+.cta-blk h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:12px}
+.cta-blk p{margin:0 auto 24px;max-width:52ch;color:#555566;font-size:16px}
+.btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-weight:560;font-size:14px;padding:13px 25px;border-radius:8px;cursor:pointer;transition:.18s;text-decoration:none;line-height:1;border:none}
+.btn-p{background:#1E2DFF;color:#fff;box-shadow:0 1px 3px rgba(30,45,255,.25),0 6px 20px rgba(30,45,255,.18)}
+.btn-p:hover{background:#2A3AFF;transform:translateY(-1px)}
+.btn-g{background:transparent;color:#0A0A1A;border:1.5px solid rgba(0,0,0,.1)}
+.btn-g:hover{border-color:#1E2DFF;color:#1E2DFF;background:#EEF0FF}
+.foot{border-top:1px solid rgba(0,0,0,.06);background:#fff}
+.foot-in{max-width:1160px;margin:0 auto;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8}
+@media(max-width:860px){.nav-tag{display:none}.map{grid-template-columns:1fr}.map dt{padding-bottom:2px}.map dd{padding-top:4px;border-top:0}.s2,.chk{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="nav-bar"><div class="nav-in">
+  <div class="nav-l"><a href="/" class="logo"><span class="s">&Phi;</span>YLAX</a><span class="nav-tag">Architecture &amp; Security</span></div>
+  <nav class="nav-links"><a href="/">Home</a><a href="/console.html">Console</a><a href="/architecture.html" class="act">Arch</a><a href="/sponsor.html">Sponsor</a><a href="/partner.html">Partner</a></nav>
+</div></header>
+
+<div class="wrap">
+  <section class="sec head rev-up" style="border-top:0"><span class="eyebrow" style="margin-bottom:8px;display:block">Architecture &amp; Security</span><h1>How the boundary holds.</h1><p style="color:#555566;font-size:16px;max-width:62ch;margin-top:14px">Phylax splits the world into partner spaces and one neutral control plane. Only opaque commitments, permitted aggregates, and hashes ever cross.</p></section>
+
+  <section class="sec" style="padding-top:4px;border-top:0"><div class="p diagram reveal d1">
+    <svg viewBox="0 0 1000 620" role="img"><defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7"><path d="M0 0 L10 5 L0 10 z" fill="#1E2DFF" opacity=".5"/></marker></defs>
+    <text x="28" y="28" font-family="monospace" fill="#999AA8" font-size="10" letter-spacing="2">PARTNER SPACES</text><text x="716" y="28" font-family="monospace" fill="#999AA8" font-size="10" letter-spacing="2">NEUTRAL CONTROL PLANE</text>
+    <g><rect x="28" y="42" width="250" height="152" rx="10" fill="#fff" stroke="rgba(0,0,0,.06)"/><text x="46" y="70" fill="#0A0A1A" font-size="13" font-weight="650">FinTrust Bank</text><text x="46" y="86" font-family="monospace" fill="#999AA8" font-size="9">org · bank · own project</text><rect x="46" y="98" width="214" height="28" rx="6" fill="#F8F9FB" stroke="rgba(0,0,0,.06)"/><text x="56" y="116" font-family="monospace" fill="#555566" font-size="10">local data · RLS · vectors (opt)</text><rect x="46" y="134" width="214" height="28" rx="6" fill="#F8F9FB" stroke="rgba(0,0,0,.06)"/><text x="56" y="152" font-family="monospace" fill="#1E2DFF" font-size="10">party compute agent · SecretFlow</text></g>
+    <g><rect x="28" y="233" width="250" height="152" rx="10" fill="#fff" stroke="rgba(0,0,0,.06)"/><text x="46" y="261" fill="#0A0A1A" font-size="13" font-weight="650">SwiftCart Marketplace</text><text x="46" y="277" font-family="monospace" fill="#999AA8" font-size="9">org · marketplace · own project</text><rect x="46" y="289" width="214" height="28" rx="6" fill="#F8F9FB" stroke="rgba(0,0,0,.06)"/><text x="56" y="307" font-family="monospace" fill="#555566" font-size="10">local data · RLS · vectors (opt)</text><rect x="46" y="325" width="214" height="28" rx="6" fill="#F8F9FB" stroke="rgba(0,0,0,.06)"/><text x="56" y="343" font-family="monospace" fill="#1E2DFF" font-size="10">party compute agent · SecretFlow</text></g>
+    <g><rect x="28" y="424" width="250" height="152" rx="10" fill="#fff" stroke="rgba(0,0,0,.06)"/><text x="46" y="452" fill="#0A0A1A" font-size="13" font-weight="650">PingLine Messaging</text><text x="46" y="468" font-family="monospace" fill="#999AA8" font-size="9">org · messaging · own project</text><rect x="46" y="480" width="214" height="28" rx="6" fill="#F8F9FB" stroke="rgba(0,0,0,.06)"/><text x="56" y="498" font-family="monospace" fill="#555566" font-size="10">local data · RLS · vectors (opt)</text><rect x="46" y="516" width="214" height="28" rx="6" fill="#F8F9FB" stroke="rgba(0,0,0,.06)"/><text x="56" y="534" font-family="monospace" fill="#1E2DFF" font-size="10">party compute agent · SecretFlow</text></g>
+    <line x1="430" y1="30" x2="430" y2="586" stroke="#1E2DFF" stroke-width="1.2" stroke-dasharray="5 6" opacity=".3"/><text x="430" y="22" text-anchor="middle" font-family="monospace" fill="#1E2DFF" font-size="9" letter-spacing="2.5" opacity=".7">TRUST MEMBRANE</text>
+    <circle cx="430" cy="310" r="36" fill="rgba(30,45,255,.04)" stroke="rgba(30,45,255,.2)" stroke-width="1.2"/><circle cx="430" cy="310" r="25" fill="none" stroke="rgba(30,45,255,.1)" stroke-width=".8"/><text x="430" y="320" text-anchor="middle" font-family="monospace" fill="#1E2DFF" font-size="28" font-weight="600">0</text><text x="430" y="360" text-anchor="middle" font-family="monospace" fill="#999AA8" font-size="8">RAW RECORDS</text>
+    <path d="M278 128 C 350 128, 360 300, 392 305" stroke="#1E2DFF" fill="none" stroke-width="1.2" opacity=".35"/><path d="M278 310 H 388" stroke="#1E2DFF" fill="none" stroke-width="1.2" opacity=".35"/><path d="M278 490 C 350 490, 360 320, 392 315" stroke="#1E2DFF" fill="none" stroke-width="1.2" opacity=".35"/><path d="M468 310 H 686" stroke="#1E2DFF" fill="none" stroke-width="1.5" opacity=".45" marker-end="url(#a)"/><text x="577" y="300" text-anchor="middle" font-family="monospace" fill="#1E2DFF" font-size="9.5">opaque commitments</text><text x="577" y="326" text-anchor="middle" font-family="monospace" fill="#999AA8" font-size="8.5">aggregate findings · hashes</text>
+    <rect x="692" y="80" width="280" height="472" rx="12" fill="#fff" stroke="rgba(30,45,255,.25)" stroke-width="1"/><rect x="692" y="80" width="280" height="44" rx="12" fill="#EEF0FF" stroke="rgba(30,45,255,.25)" stroke-width="1"/><text x="710" y="100" fill="#0A0A1A" font-size="12.5" font-weight="650">Phylax Control</text><text x="710" y="115" font-family="monospace" fill="#1E2DFF" font-size="9">InsForge · kd6vibk3 · is_control</text>
+    <g font-family="monospace" font-size="10.5"><rect x="710" y="140" width="244" height="60" rx="8" fill="#F8F9FB" stroke="rgba(0,0,0,.06)"/><text x="722" y="164" fill="#0A0A1A">Auth + RLS</text><text x="722" y="182" fill="#555566" font-size="9">6 roles · tenant isolation</text><rect x="710" y="210" width="244" height="60" rx="8" fill="#F8F9FB" stroke="rgba(0,0,0,.06)"/><text x="722" y="234" fill="#0A0A1A">Postgres</text><text x="722" y="252" fill="#555566" font-size="9">13 tables · state machine · audit</text><rect x="710" y="280" width="244" height="60" rx="8" fill="#F8F9FB" stroke="rgba(0,0,0,.06)"/><text x="722" y="304" fill="#0A0A1A">Edge Functions</text><text x="722" y="322" fill="#555566" font-size="9">8 fns · HMAC + replay guard</text><rect x="710" y="350" width="244" height="60" rx="8" fill="#F8F9FB" stroke="rgba(0,0,0,.06)"/><text x="722" y="374" fill="#0A0A1A">Realtime</text><text x="722" y="392" fill="#555566" font-size="9">run: / org: · safe metadata</text><rect x="710" y="420" width="244" height="60" rx="8" fill="#F8F9FB" stroke="rgba(0,0,0,.06)"/><text x="722" y="444" fill="#0A0A1A">Storage</text><text x="722" y="462" fill="#555566" font-size="9">private phylax-artifacts bucket</text></g>
+    <text x="430" y="404" text-anchor="middle" font-family="monospace" fill="#DC2626" font-size="8.5" letter-spacing="1">NEVER CROSSES</text><text x="430" y="418" text-anchor="middle" font-family="monospace" fill="#999AA8" font-size="8">raw · identities · vectors</text><text x="430" y="430" text-anchor="middle" font-family="monospace" fill="#999AA8" font-size="8">watchlists · account numbers</text>
+    </svg>
+    <div class="leg"><i><span class="ln"></span>crosses: commitments, aggregates, hashes</i><i><span class="ln d"></span>trust membrane boundary</i><i><span class="sq"></span>never centralized: raw, identities, vectors</i></div>
+  </div></section>
+
+  <section class="sec"><div class="hd reveal"><span class="eyebrow">InsForge feature map</span><h2>The neutral control plane.</h2></div><dl class="map">
+    <dt>Auth + RLS</dt><dd><b>6 roles</b> — <span class="m">platform_admin · partner_admin · analyst · operator · approver · auditor</span>. Tenant isolation: a FinTrust user cannot read SwiftCart's private batches.</dd>
+    <dt>Postgres</dt><dd><b>13 tables</b> — <span class="m">draft → awaiting_parties → running → protected_match → risk_scored → awaiting_approval → actioned → receipted</span>. <span class="m">raw_records_shared = 0</span> enforced by trigger.</dd>
+    <dt>Edge Functions</dt><dd><b>8 functions</b> — <span class="pil">submit-signal-manifest</span><span class="pil">create-detection-run</span><span class="pil">dispatch-party-run</span><span class="pil">receive-worker-callback</span><span class="pil">request-action</span><span class="pil">approve-action</span><span class="pil">issue-receipt</span><span class="pil">verify-receipt</span>.</dd>
+    <dt>Realtime</dt><dd>Live progress on <span class="m">run:{id}</span> and <span class="m">org:{id}</span> channels. Subscription gated by RLS.</dd>
+    <dt>Storage</dt><dd>Private <span class="m">phylax-artifacts</span> bucket. DB: pointers + checksums only.</dd>
+    <dt>Custom Compute</dt><dd>Dockerized <b>SecretFlow party services</b> (Linux, Python 3.10).</dd>
+  </dl></section>
+
+  <section class="sec"><div class="hd reveal"><span class="eyebrow">SecretFlow feature map</span><h2>Privacy-preserving computation.</h2></div><dl class="map">
+    <dt>ECDH PSI</dt><dd><b>Private set intersection</b> — <span class="m">ECDH_PSI_3PC</span>, <span class="m">secretflow 1.10.0b1</span>. Coordinator sees only the intersection.</dd>
+    <dt>Secure aggregation</dt><dd><b>Additive secret sharing</b> over Mersenne-prime field.</dd>
+    <dt>Federated risk</dt><dd><b>phylax-risk 1.0.0</b> over <span class="m">distinct_parties, matched_signatures, total_events, mean_velocity_z, temporal_alignment</span>.</dd>
+    <dt>Local backend</dt><dd><span class="m">2048-bit MODP DDH-PSI</span> (RFC 3526).</dd>
+  </dl></section>
+
+  <section class="sec"><div class="hd reveal"><h2>Demo vs production</h2></div><div class="s2">
+    <div class="p reveal d1"><div class="p-hd">Demo · today <span class="tag a">functional demo</span></div><ul class="d"><li><b>Synthetic data</b> — no real customers.</li><li>Single <b>InsForge account</b>.</li><li>Proves <b>protocol + product</b>.</li><li><b>Not</b> adversarial isolation.</li></ul></div>
+    <div class="p reveal d2"><div class="p-hd">Production · design <span class="tag b">independent parties</span></div><ul class="p"><li><b>Own InsForge project</b> per org.</li><li><b>Threshold OPRF</b> key.</li><li><b>Per-org Ed25519</b> signing.</li><li><b>Zero raw records</b> invariant holds.</li></ul></div>
+  </div></section>
+
+  <section class="sec"><div class="hd reveal"><h2>The checklist</h2></div><div class="chk">
+    <div><h4>Running now</h4><ul>
+      <li><span class="ic" style="color:#1E2DFF">&#x2713;</span> DDH-PSI locally; SecretFlow <span class="m">ECDH_PSI_3PC</span> in prod</li>
+      <li><span class="ic" style="color:#1E2DFF">&#x2713;</span> Trained logistic-regression — not an LLM</li>
+      <li><span class="ic" style="color:#1E2DFF">&#x2713;</span> Monotonic state machine + append-only audit</li>
+      <li><span class="ic" style="color:#1E2DFF">&#x2713;</span> RLS tenant isolation</li>
+      <li><span class="ic" style="color:#1E2DFF">&#x2713;</span> <span class="m">raw_records_shared = 0</span> hard invariant</li>
+    </ul></div>
+    <div class="w"><h4>Honestly still staged</h4><ul>
+      <li><span class="ic" style="color:#CC6C00">&#x26A0;</span> Single-account demo topology</li>
+      <li><span class="ic" style="color:#CC6C00">&#x26A0;</span> Synthetic data only</li>
+      <li><span class="ic" style="color:#CC6C00">&#x26A0;</span> No third-party security audit</li>
+      <li><span class="ic" style="color:#CC6C00">&#x26A0;</span> Threshold OPRF-key designed, not deployed</li>
+    </ul></div>
+  </div></section>
+
+  <section class="sec cta-blk"><span class="eyebrow" style="margin-bottom:8px;display:block">Next</span><h2>See the boundary in motion.</h2><p>The console runs the full pipeline live against the InsForge control plane.</p>
+  <div class="btns"><a class="btn btn-p" href="/console.html">Open the console &rarr;</a><a class="btn btn-g" href="/sponsor.html">Why InsForge</a></div></section>
+</div>
+
+<footer class="foot"><div class="foot-in"><span>&Phi;YLAX v2.0</span><span style="color:#1E2DFF">raw_records_shared = 0</span><span>synthetic demo · real PSI + MPC</span></div></footer>
+<script src="/assets/animations.js"></script>
+</body>
+</html>

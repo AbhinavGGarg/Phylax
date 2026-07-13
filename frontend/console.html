@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Phylax · Containment Console</title>
+<style>
+  *{box-sizing:border-box;margin:0}
+  html{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased}
+  body{background:#F8F9FB;color:#0A0A1A;font-size:14px;line-height:1.5;letter-spacing:-.01em;overflow:hidden;height:100vh}
+
+  .app{height:100vh;display:flex;flex-direction:column;padding:10px 14px 8px;gap:8px;max-width:1680px;margin:0 auto}
+
+  .top-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.04);flex-wrap:wrap}
+  .top-l{display:flex;align-items:center;gap:14px}
+  .logo{display:inline-flex;align-items:center;gap:.35ch;font-weight:730;font-size:19px;letter-spacing:-.03em;color:#0A0A1A;text-decoration:none}
+  .logo .s{font-family:'JetBrains Mono',monospace;color:#1E2DFF;font-weight:600}
+  .top-tag{font-size:12px;color:#999AA8;border-left:1px solid rgba(0,0,0,.06);padding-left:14px;white-space:nowrap}
+  .top-r{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .chip{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border:1px solid rgba(0,0,0,.08);border-radius:5px;background:rgba(0,0,0,.02);font-family:'JetBrains Mono',monospace;font-size:10px;color:#555566}
+  .chip .v{color:#0A0A1A;font-weight:520}
+  .chip .z{color:#1E2DFF;font-weight:600}
+  .nav-links{display:flex;gap:1px}
+  .nav-links a{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.05em;color:#555566;padding:7px 11px;border-radius:4px;text-decoration:none;text-transform:uppercase;transition:.15s}
+  .nav-links a:hover{color:#0A0A1A;background:rgba(0,0,0,.04)}
+
+  .grid{display:grid;grid-template-columns:280px 1fr 310px;gap:10px;flex:1;min-height:0}
+  .col{display:flex;flex-direction:column;gap:10px;min-height:0}
+  .stage{flex:1;display:flex;flex-direction:column;min-height:0}
+
+  .p{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.04);overflow:hidden}
+  .p-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(0,0,0,.06);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.08em;color:#999AA8;text-transform:uppercase}
+  .p-bd{padding:12px 14px;overflow:auto}
+
+  .sig{padding:11px 12px;border:1px solid rgba(0,0,0,.05);border-radius:8px;margin-bottom:7px;transition:.15s}
+  .sig:last-child{margin-bottom:0}
+  .sig:hover{border-color:rgba(0,0,0,.1);background:rgba(0,0,0,.01)}
+  .sig-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px}
+  .sig .who{font-weight:600;font-size:13.5px}
+  .sig .blurb{color:#555566;font-size:11.5px;line-height:1.45;margin-bottom:8px}
+  .sig .risk{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8}
+  .sig .risk .bar{flex:1;height:4px;border-radius:99px;background:rgba(0,0,0,.04);overflow:hidden}
+  .sig .risk .bar i{display:block;height:100%;border-radius:99px;background:#1E2DFF;transition:width .8s}
+
+  .tl-wrap{flex:1;overflow:auto;padding:4px 2px 4px 0}
+  .tl{display:flex;gap:10px;padding:7px 6px 7px 2px;position:relative;animation:fadeIn .3s ease}
+  .tl .r{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:12px}
+  .tl .r i{width:7px;height:7px;border-radius:50%;margin-top:4px;flex-shrink:0}
+  .tl .r span{flex:1;width:1px;background:rgba(0,0,0,.06);margin:2px 0 -6px}
+  .tl:last-child .r span{display:none}
+  .tl .b{flex:1;min-width:0}
+  .tl .ev{font-size:12px;font-weight:520}
+  .tl .mt{font-family:'JetBrains Mono',monospace;font-size:9px;color:#999AA8;margin-top:1px}
+  .tl.cy .r i{background:#1E2DFF;box-shadow:0 0 8px rgba(30,45,255,.3)}
+  .tl.em .r i{background:#169B5A;box-shadow:0 0 8px rgba(22,155,90,.25)}
+  .tl.am .r i{background:#CC6C00;box-shadow:0 0 8px rgba(204,108,0,.25)}
+  .tl.cr .r i{background:#DC2626;box-shadow:0 0 8px rgba(220,38,38,.25)}
+
+  @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+  svg.graph{width:100%;height:100%;display:block}
+
+  .phase{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid rgba(0,0,0,.06);min-height:40px}
+  .phase .lab{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#1E2DFF;transition:color .3s}
+  .phase .sub{font-family:'JetBrains Mono',monospace;font-size:9px;color:#999AA8;margin-left:auto}
+  .phase .dot{width:7px;height:7px;border-radius:50%;background:#1E2DFF;box-shadow:0 0 8px rgba(30,45,255,.3);flex-shrink:0}
+  .phase .dot.idle{background:#c0c0d0;box-shadow:none}
+
+  .verdict-grid{display:grid;grid-template-columns:1.1fr 1fr 1.1fr;gap:12px}
+  .drivers .r2{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:11px}
+  .drivers .r2 .nm{width:120px;color:#555566;flex-shrink:0;font-family:'JetBrains Mono',monospace;font-size:10px}
+  .drivers .r2 .bar{flex:1;height:4px;border-radius:99px;background:rgba(0,0,0,.04);overflow:hidden}
+  .drivers .r2 .vv{font-family:'JetBrains Mono',monospace;width:36px;text-align:right;font-size:10px;color:#0A0A1A}
+  .actions .act{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid rgba(0,0,0,.06);border-radius:7px;margin-bottom:6px}
+  .act .lbl{font-size:12px}
+  .act .s{font-family:'JetBrains Mono',monospace;font-size:9px;color:#999AA8}
+  .boundary{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(0,0,0,.06);border-radius:8px;overflow:hidden}
+  .boundary>div{background:#F8F9FB;padding:10px 12px}
+  .boundary h4{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+  .boundary .keep h4{color:#1E2DFF}
+  .boundary .never h4{color:#DC2626}
+  .boundary li{font-size:11px;color:#555566;margin:3px 0;list-style:none;padding-left:14px;position:relative}
+  .boundary li:before{content:"";position:absolute;left:0;top:5px;width:5px;height:5px;border-radius:1px}
+  .boundary .keep li:before{background:#1E2DFF}
+  .boundary .never li:before{background:#DC2626}
+
+  .tag{display:inline-flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.06em;padding:2px 6px;border-radius:3px;border:1px solid rgba(0,0,0,.1);color:#555566;text-transform:uppercase}
+  .tag.cy{color:#1E2DFF;border-color:rgba(30,45,255,.2);background:rgba(30,45,255,.06)}
+  .tag.am{color:#CC6C00;border-color:rgba(204,108,0,.2);background:rgba(204,108,0,.06)}
+  .tag.cr{color:#DC2626;border-color:rgba(220,38,38,.2);background:rgba(220,38,38,.06)}
+  .tag.em{color:#169B5A;border-color:rgba(22,155,90,.2);background:rgba(22,155,90,.06)}
+  .dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+  .dot.on{background:#1E2DFF;box-shadow:0 0 6px rgba(30,45,255,.3)}
+  .dot.warn{background:#CC6C00;box-shadow:0 0 6px rgba(204,108,0,.25)}
+  .dot.bad{background:#DC2626;box-shadow:0 0 6px rgba(220,38,38,.25)}
+  .dot.pulse{animation:pulse 1.6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:560;font-size:13px;padding:11px 22px;border-radius:7px;cursor:pointer;transition:.15s;border:none;font-family:inherit;line-height:1}
+  .btn:disabled{opacity:.35;cursor:not-allowed;pointer-events:none}
+  .btn-p{background:#1E2DFF;color:#fff;box-shadow:0 1px 3px rgba(30,45,255,.25),0 6px 18px rgba(30,45,255,.18)}
+  .btn-p:hover:not(:disabled){background:#2A3AFF;transform:translateY(-1px)}
+  .btn-g{background:transparent;color:#0A0A1A;border:1px solid rgba(0,0,0,.12)}
+  .btn-g:hover:not(:disabled){border-color:#1E2DFF;color:#1E2DFF;background:rgba(30,45,255,.06)}
+
+  .kv{display:flex;justify-content:space-between;gap:10px;font-size:11.5px;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.04)}
+  .kv:last-child{border-bottom:0}
+  .kv .k{color:#999AA8}
+  .kv .v{font-family:'JetBrains Mono',monospace;color:#0A0A1A}
+  .hidden{display:none!important}
+  .mt{color:#999AA8;font-size:11px}
+
+  @media(max-width:1180px){.grid{grid-template-columns:1fr}.stage{min-height:340px}.verdict-grid{grid-template-columns:1fr}.top-tag{display:none}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="top-bar">
+    <div class="top-l">
+      <a href="/" class="logo"><span class="s">&Phi;</span>YLAX</a>
+      <span class="top-tag">Containment Console</span>
+    </div>
+    <div class="top-r" id="tele">
+      <span class="chip"><span class="dot on" id="netdot"></span> Network <span class="v" id="nethealth">nominal</span></span>
+      <span class="chip">Participants <span class="v" id="participants">4</span></span>
+      <span class="chip">Sweep <span class="v" id="sweepstate">idle</span></span>
+      <span class="chip" title="Must never move from 0">Raw shared <span class="v z" id="rawcount">0</span></span>
+      <nav class="nav-links"><a href="/">Home</a><a href="/console.html">Console</a><a href="/architecture.html">Arch</a><a href="/sponsor.html">Sponsor</a><a href="/partner.html">Partner</a></nav>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="col">
+      <div class="p" style="flex:1;display:flex;flex-direction:column">
+        <div class="p-hd">What each organization sees <span class="tag am" id="isoTag">isolated</span></div>
+        <div class="p-bd" id="signals" style="overflow:auto"><p class="mt">Three platforms, three fragments. Each below threshold.</p></div>
+      </div>
+      <div class="p">
+        <div class="boundary">
+          <div class="keep"><h4>Stored centrally</h4><ul><li>input commitments</li><li>opaque campaign id</li><li>aggregate features</li><li>derived risk score</li><li>proof + receipt hash</li></ul></div>
+          <div class="never"><h4>Never centrally</h4><ul><li>raw messages</li><li>customer identities</li><li>account numbers</li><li>private watchlists</li><li>embeddings / vectors</li></ul></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="p stage">
+        <div class="p-hd">Protected topology <span class="tag cy" id="backendTag">psi: modp-ddh</span></div>
+        <div style="flex:1;position:relative;min-height:0">
+          <svg class="graph" viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid meet" id="graph"></svg>
+        </div>
+        <div class="phase">
+          <span class="dot idle" id="phasedot"></span>
+          <span class="lab" id="phaselab">standby</span>
+          <span class="sub" id="phasesub"></span>
+          <button class="btn btn-p" id="runBtn" style="margin-left:auto">Run Protected Sweep</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="p" style="flex:1;display:flex;flex-direction:column;min-height:0">
+        <div class="p-hd">Incident timeline <span class="tag" id="runIdTag">no active run</span></div>
+        <div class="tl-wrap" id="timeline"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="p" id="verdictPanel" style="flex-shrink:0">
+    <div class="p-hd">Campaign finding <span class="tag" id="verdictTag">awaiting match</span></div>
+    <div class="p-bd verdict-grid">
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#999AA8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Campaign</div>
+        <div id="findingEmpty" class="mt">No campaign proven yet. Run a protected sweep.</div>
+        <div id="finding" class="hidden">
+          <div class="kv"><span class="k">Campaign id</span><span class="v" id="fCampaign">&mdash;</span></div>
+          <div class="kv"><span class="k">Shared sigs</span><span class="v" id="fCard">&mdash;</span></div>
+          <div class="kv"><span class="k">Platforms</span><span class="v" id="fParties">&mdash;</span></div>
+          <div class="kv"><span class="k">Proof hash</span><span class="v" id="fProof">&mdash;</span></div>
+          <div class="kv"><span class="k">Raw shared</span><span class="v" style="color:#1E2DFF">0</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#999AA8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Risk model</div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:600;color:#DC2626" id="riskPct">&mdash;</span>
+          <span class="mt" style="font-size:10px">collective &middot; <span id="modelTag" style="font-family:'JetBrains Mono',monospace">phylax-risk 1.0.0</span></span>
+        </div>
+        <div style="height:5px;border-radius:99px;background:rgba(0,0,0,.04);margin:6px 0 3px;overflow:hidden"><i id="riskBar" style="display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#CC6C00,#DC2626);transition:width .9s"></i></div>
+        <p class="mt" style="font-size:10px;margin-bottom:10px">Confidence <span id="confVal" style="font-family:'JetBrains Mono',monospace">&mdash;</span></p>
+        <div class="drivers" id="drivers"></div>
+      </div>
+      <div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#999AA8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Response</div>
+        <div class="actions" id="actions"><p class="mt">Actions appear once scored. Nothing auto-executes.</p></div>
+        <div id="receiptBox" class="hidden" style="margin-top:4px"></div>
+      </div>
+    </div>
+  </div>
+  <div class="mt" style="text-align:center;font-size:10px" id="topo">synthetic demo &middot; real PSI + MPC &middot; InsForge control plane</div>
+</div>
+
+<script src="/assets/console.js"></script>
+<script src="/assets/animations.js"></script>
+</body>
+</html>

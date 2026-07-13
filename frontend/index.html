@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>ΦYLAX · Prove the campaign. Share nothing.</title>
+<style>
+*{box-sizing:border-box;margin:0}
+html{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{background:#F8F9FB;color:#0A0A1A;font-size:15px;line-height:1.6;letter-spacing:-.01em;overflow-x:hidden}
+.nav-bar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,.06)}
+.nav-in{max-width:1160px;margin:0 auto;padding:12px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.nav-l{display:flex;align-items:center;gap:14px}
+.logo{display:inline-flex;align-items:center;gap:.35ch;font-weight:730;font-size:21px;letter-spacing:-.03em;color:#0A0A1A;text-decoration:none}
+.logo .s{font-family:'JetBrains Mono',monospace;color:#1E2DFF;font-weight:600}
+.nav-tag{font-size:13px;color:#999AA8;border-left:1px solid rgba(0,0,0,.06);padding-left:14px;white-space:nowrap}
+.nav-links{display:flex;gap:1px}
+.nav-links a{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.05em;color:#555566;padding:7px 11px;border-radius:4px;text-decoration:none;text-transform:uppercase;transition:.15s}
+.nav-links a:hover{color:#0A0A1A;background:rgba(0,0,0,.04)}
+.nav-links a.act{color:#1E2DFF;background:#EEF0FF;font-weight:520}
+.wrap{max-width:1160px;margin:0 auto;padding:0 28px}
+.sec{padding:80px 0}
+.sec+.sec{border-top:1px solid rgba(0,0,0,.06)}
+.hd{margin-bottom:32px}
+.hd .eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#999AA8;display:block;margin-bottom:8px}
+.hd h2{font-size:clamp(23px,2.8vw,34px);font-weight:650;letter-spacing:-.025em;line-height:1.12;margin-bottom:10px}
+.hd p{font-size:16px;color:#555566;line-height:1.6;max-width:60ch}
+.p{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);overflow:hidden}
+.p-pd{padding:20px 24px}
+.p-hd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-bottom:1px solid rgba(0,0,0,.06);font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8;text-transform:uppercase;letter-spacing:.06em}
+.tag{display:inline-flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.04em;padding:3px 8px;border-radius:4px;border:1px solid rgba(0,0,0,.1);color:#555566;text-transform:uppercase}
+.tag.b{color:#1E2DFF;border-color:rgba(30,45,255,.2);background:#EEF0FF}
+.tag.a{color:#CC6C00;border-color:rgba(204,108,0,.2);background:rgba(204,108,0,.06)}
+.tag.r{color:#DC2626;border-color:rgba(220,38,38,.2);background:rgba(220,38,38,.06)}
+.tag.g{color:#169B5A;border-color:rgba(22,155,90,.2);background:rgba(22,155,90,.06)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-weight:560;font-size:14px;padding:13px 25px;border-radius:8px;cursor:pointer;transition:.18s;text-decoration:none;line-height:1;border:none}
+.btn-p{background:#1E2DFF;color:#fff;box-shadow:0 1px 3px rgba(30,45,255,.25),0 6px 20px rgba(30,45,255,.18)}
+.btn-p:hover{background:#2A3AFF;transform:translateY(-1px);box-shadow:0 2px 8px rgba(30,45,255,.32),0 10px 30px rgba(30,45,255,.22)}
+.btn-g{background:transparent;color:#0A0A1A;border:1.5px solid rgba(0,0,0,.1)}
+.btn-g:hover{border-color:#1E2DFF;color:#1E2DFF;background:#EEF0FF}
+.foot{border-top:1px solid rgba(0,0,0,.06);background:#fff}
+.foot-in{max-width:1160px;margin:0 auto;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8;letter-spacing:.04em}
+
+.hero{padding:90px 28px 80px;max-width:1160px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:clamp(32px,5vw,64px);align-items:center}
+.globe-wrap{position:relative;width:100%;max-width:500px;aspect-ratio:1;justify-self:center;border-radius:20px;overflow:hidden;background:#fff;border:1px solid rgba(0,0,0,.06);box-shadow:0 1px 3px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06)}
+.globe-wrap canvas{display:block;width:100%;height:100%}
+.globe-wrap .hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:9px;color:#999AA8;letter-spacing:.1em;text-transform:uppercase;pointer-events:none;white-space:nowrap}
+.hero-accent{display:flex;align-items:center;gap:10px;margin-bottom:16px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;color:#1E2DFF;text-transform:uppercase}
+.hero-accent .dash{flex:1;height:1px;background:rgba(30,45,255,.15)}
+h1{font-size:clamp(36px,5.2vw,60px);font-weight:660;letter-spacing:-.035em;line-height:.96;margin-bottom:12px}
+h1 .dim{color:#555566}
+.lede{font-size:clamp(14px,1.1vw,16px);color:#555566;line-height:1.65;margin-bottom:26px;max-width:52ch}
+.btns{display:flex;gap:12px;flex-wrap:wrap}
+.hero-note{display:flex;align-items:center;gap:10px;margin-top:18px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#999AA8}
+.hero-note .ac{color:#1E2DFF}
+
+.stats{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.04);display:flex;flex-wrap:wrap;gap:12px 32px;justify-content:center;padding:18px 28px;margin:0 28px 80px;max-width:1160px;margin-left:auto;margin-right:auto}
+.stat-i{display:flex;flex-direction:column;align-items:center;gap:2px}
+.stat-i .v{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:650;color:#0A0A1A}
+.stat-i .v.bl{color:#1E2DFF}.stat-i .v.rd{color:#DC2626}
+.stat-i .l{font-family:'JetBrains Mono',monospace;font-size:9px;color:#999AA8;letter-spacing:.04em;text-transform:uppercase}
+
+.frags{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.frag{padding:18px 20px}
+.frag .who{font-weight:650;font-size:15px;margin-bottom:1px}
+.frag .kind{font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8;text-transform:uppercase;margin-bottom:10px}
+.frag .what{font-size:13.5px;color:#555566;line-height:1.5;margin-bottom:14px}
+.frag .risk{display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#999AA8}
+.frag .risk .bar-w{flex:1;height:6px;border-radius:99px;background:rgba(0,0,0,.04);overflow:hidden}
+.frag .risk .bar-w i{display:block;height:100%;border-radius:99px;background:#1E2DFF}
+.conclusion{text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:#555566;margin-top:24px}
+.conclusion b{color:#0A0A1A}
+
+.pipe{border-radius:12px;overflow:hidden;border:1px solid rgba(0,0,0,.06);background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06)}
+.pipe-r{display:grid;grid-template-columns:56px 1fr 210px;gap:16px;align-items:baseline;padding:16px 22px;border-bottom:1px solid rgba(0,0,0,.06)}
+.pipe-r:last-child{border-bottom:0}
+.pipe-r .n{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:650;color:#1E2DFF}
+.pipe-r .b h4{font-size:14.5px;font-weight:650;margin-bottom:3px}
+.pipe-r .b p{font-size:13px;color:#555566;line-height:1.55;margin-bottom:6px}
+.pipe-r .b .tg{display:flex;gap:6px;flex-wrap:wrap}
+.pipe-r .m{font-family:'JetBrains Mono',monospace;font-size:11px;color:#999AA8;line-height:1.6}
+.pipe-r .m b{color:#0A0A1A;font-weight:500}
+
+.audit{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.audit .ac{padding:22px 24px}
+.audit .ac h4{font-size:14px;font-weight:650;display:flex;align-items:center;gap:8px}
+.audit .ac p{font-size:13px;color:#555566;margin-top:8px;line-height:1.55}
+.ic{font-family:'JetBrains Mono',monospace;flex-shrink:0;font-size:14px}
+.ic.bl{color:#1E2DFF}.ic.am{color:#CC6C00}
+.audit-d{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8}
+.audit-d span{display:flex;align-items:center;gap:6px}
+
+.biz{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06);font-size:13px}
+.kv:last-child{border-bottom:0}
+.kv .k{color:#999AA8}
+.kv .v{font-family:'JetBrains Mono',monospace;color:#0A0A1A}
+.ai-r{display:grid;grid-template-columns:90px 1fr;gap:12px;padding:13px 0;border-bottom:1px solid rgba(0,0,0,.06);font-size:13px}
+.ai-r:last-child{border-bottom:0}
+.ai-r .t{font-family:'JetBrains Mono',monospace;font-size:11px;color:#1E2DFF}
+.ai-r .d{color:#555566;line-height:1.5}
+.ai-r .d b{color:#0A0A1A;font-weight:600}
+
+.cta-blk{text-align:center;padding:80px 0}
+.cta-blk h2{font-size:clamp(26px,3.4vw,40px);margin-bottom:12px}
+.cta-blk p{margin:0 auto 24px;max-width:52ch;color:#555566;font-size:16px}
+
+@media(max-width:920px){
+  .hero{grid-template-columns:1fr}.globe-wrap{max-width:360px}.frags{grid-template-columns:1fr}.audit,.biz{grid-template-columns:1fr}.nav-tag{display:none}.pipe-r{grid-template-columns:40px 1fr}.pipe-r .m{display:none}
+}
+@media(max-width:640px){.stats{gap:10px 18px}.stat-i .v{font-size:16px}}
+</style>
+</head>
+<body>
+
+<header class="nav-bar"><div class="nav-in">
+  <div class="nav-l"><a href="/" class="logo"><span class="s">&Phi;</span>YLAX</a><span class="nav-tag">Collective Campaign Containment</span></div>
+  <nav class="nav-links">
+    <a href="/" class="act">Home</a>
+    <a href="/architecture.html">Arch</a>
+    <a href="/sponsor.html">Sponsor</a>
+    <a href="/partner.html">Partner</a>
+    <a href="/console.html">Console</a>
+  </nav>
+</div></header>
+
+<section class="hero">
+  <div class="globe-wrap rev-scale"><canvas></canvas><span class="hint">drag to rotate &middot; scroll to zoom</span></div>
+  <div>
+    <div class="hero-accent rev-up"><span>Privacy-preserving trust &amp; safety network</span><span class="dash"></span></div>
+    <h1 class="rev-up d1">Prove the campaign.<br><span class="dim">Share nothing.</span></h1>
+    <p class="lede rev-up d2">Three companies each hold a scam fragment too weak to act on alone. Phylax lets them prove a single coordinated campaign together — without exposing customer identities, raw messages, private watchlists, or embeddings.</p>
+    <div class="btns rev-up d3"><a class="btn btn-p" href="/console.html">Open the console &rarr;</a><a class="btn btn-g" href="/architecture.html">How it works</a></div>
+    <div class="hero-note rev-up d4"><span class="ac">data moves</span><span style="width:22px;height:1px;background:rgba(0,0,0,.1);display:inline-block"></span>0 is shared</div>
+  </div>
+</section>
+
+<div class="stats reveal"><div class="stat-i"><span class="v" data-count="3">0</span><span class="l">platforms</span></div><div class="stat-i"><span class="v" data-count="4">0</span><span class="l">signatures</span></div><div class="stat-i"><span class="v bl">0</span><span class="l">raw shared</span></div><div class="stat-i"><span class="v">~6s</span><span class="l">match time</span></div><div class="stat-i"><span class="v rd" data-count="99.98" data-decimals="2">0%</span><span class="l">collective</span></div><div class="stat-i"><span class="v" data-count="1">0</span><span class="l">approval</span></div></div>
+
+<div class="wrap">
+  <section class="sec"><div class="hd reveal"><span class="eyebrow">The problem</span><h2>Scam rings are cross-platform. Every defender sees a fragment.</h2><p>A single ring launders through a bank, recruits on a marketplace, and sprays links over a messenger. Each platform sees one piece — below its own action threshold. Pooling the raw data is exactly what they cannot do.</p></div>
+  <div class="frags">
+    <div class="p frag reveal d1"><div class="who">FinTrust Bank</div><div class="kind">Bank</div><div class="what">Unusual payout velocity to a newly-seen payee cluster. Velocity 14x above baseline for the region.</div><div class="risk"><span>Solo risk</span><div class="bar-w"><i style="width:3%"></i></div><span>0.77%</span></div></div>
+    <div class="p frag reveal d2"><div class="who">SwiftCart</div><div class="kind">Marketplace</div><div class="what">Seller steering buyers off-platform. Message patterns match known social-engineering templates.</div><div class="risk"><span>Solo risk</span><div class="bar-w"><i style="width:3%"></i></div><span>0.82%</span></div></div>
+    <div class="p frag reveal d3"><div class="who">PingLine</div><div class="kind">Messaging</div><div class="what">Burst of near-identical messages with a short link. 2,100+ recipients across 14 groups in under 3 minutes.</div><div class="risk"><span>Solo risk</span><div class="bar-w"><i style="width:9%"></i></div><span>2.79%</span></div></div>
+  </div>
+  <p class="conclusion reveal d4">Individually: noise. <b>Collective via PSI: 99.98%</b> campaign proven — zero raw records shared.</p></section>
+
+  <section class="sec"><div class="hd reveal"><span class="eyebrow">Pipeline</span><h2>Five steps. Data stays home. Only proof moves.</h2><p>Every stage is engineered so that what crosses the trust membrane is opaque or aggregate — never a raw record.</p></div>
+  <div class="pipe">
+    <div class="pipe-r reveal"><div class="n">01</div><div class="b"><h4>Local signals</h4><p>Each party derives anomaly signals inside its own perimeter: payout velocity, off-platform steering, link bursts. Computed under that org's own row-level security.</p><div class="tg"><span class="tag b">on-prem</span></div></div><div class="m">crosses: <b>nothing</b></div></div>
+    <div class="pipe-r reveal d1"><div class="n">02</div><div class="b"><h4>OPRF commitments</h4><p>Candidate signatures become opaque commitments under a jointly-governed key. No party can enumerate another's inputs.</p><div class="tg"><span class="tag b">oprf-ristretto255</span></div></div><div class="m">crosses: <b>commitments</b></div></div>
+    <div class="pipe-r reveal d2"><div class="n">03</div><div class="b"><h4>Protected match</h4><p>ECDH / DDH private-set-intersection runs across party agents. Coordinator relays blinded group elements and learns only the intersection. Non-matching tokens stay hidden.</p><div class="tg"><span class="tag b">ECDH_PSI_3PC</span></div></div><div class="m">crosses: <b>group elements</b></div></div>
+    <div class="pipe-r reveal d3"><div class="n">04</div><div class="b"><h4>Federated risk score</h4><p>Logistic regression over five aggregate features — trained offline, reproducible from seed. Not an LLM, not a random number.</p><div class="tg"><span class="tag r">phylax-risk 1.0.0</span></div></div><div class="m">crosses: <b>5 aggregate features</b></div></div>
+    <div class="pipe-r reveal d4"><div class="n">05</div><div class="b"><h4>Human-approved action</h4><p>Smallest proportionate response — hold payout, quarantine listing, warn recipients. Human at target org approves. Nothing auto-executes.</p><div class="tg"><span class="tag g">Ed25519 receipt</span></div></div><div class="m">crosses: <b>decision hash</b></div></div>
+  </div></section>
+
+  <section class="sec"><div class="hd reveal"><span class="eyebrow">Audit</span><h2>What is running — and what is honestly still a demo.</h2><p>Security products earn trust by being precise about their own limits.</p></div>
+  <div class="audit">
+    <div class="p ac reveal d1"><h4><span class="ic bl">&check;</span> Protocol is real</h4><p>DDH-PSI executes locally; SecretFlow SPU ECDH_PSI_3PC in production. Non-matching tokens hidden by DDH assumption. Coordinator never sees a raw identifier.</p></div>
+    <div class="p ac reveal d2"><h4><span class="ic bl">&check;</span> Model is trained</h4><p>Logistic regression fitted offline by gradient descent, verified to reproduce from seed. Shipped with feature spec and params hash. Not an LLM.</p></div>
+    <div class="p ac reveal d3"><h4><span class="ic bl">&check;</span> Zero raw records</h4><p>raw_records_shared = 0 is a hard database invariant enforced by trigger. Never a message, identity, account number, watchlist, or vector enters the neutral plane.</p></div>
+    <div class="p ac reveal d4"><h4><span class="ic am">&excl;</span> Topology is staged</h4><p>Single-account demo with synthetic data. Proves protocol and product — <b style="color:#0A0A1A;font-weight:600">not</b> adversarial infrastructure isolation. Production: per-org projects with independent key material.</p></div>
+  </div>
+  <div class="audit-d reveal d5"><span>&times; Not E2EE — it's PSI + MPC</span><span>&times; No legal/compliance certification claimed</span><span>&times; No automatic accusations — human at target org required</span></div></section>
+
+  <section class="sec"><div class="hd reveal"><span class="eyebrow">Business</span><h2>A B2B trust-&amp;-safety company. Not a chatbot wrapper.</h2><p>A containment consortium that banks, marketplaces, and messaging platforms subscribe to — because coordinated fraud is a shared loss and, until now, an unshareable one.</p></div>
+  <div class="biz">
+    <div class="p reveal d1" style="padding:0"><div class="p-hd">Who pays &amp; why</div><div class="p-pd">
+      <div class="kv"><span class="k">Members</span><span class="v">banks &middot; marketplaces &middot; messengers</span></div>
+      <div class="kv"><span class="k">Pricing</span><span class="v">subscription + per-consortium</span></div>
+      <div class="kv"><span class="k">Value 1</span><span class="v">fraud-loss reduction</span></div>
+      <div class="kv"><span class="k">Value 2</span><span class="v">regulation-safe collaboration</span></div>
+      <div class="kv"><span class="k">Value 3</span><span class="v">faster coordinated takedown</span></div>
+      <p style="font-size:12px;color:#999AA8;margin-top:14px;line-height:1.55">Prove the ring, cut the losses, and never once move a customer record across an organizational boundary.</p>
+    </div></div>
+    <div class="p reveal d2" style="padding:0"><div class="p-hd">Where the AI is <span class="tag b">no chatbot</span></div><div class="p-pd">
+      <div class="ai-r"><span class="t">MODEL</span><span class="d"><b>Federated risk model.</b> Trained logistic regression scoring coordinated-campaign risk over privacy-preserving aggregate features.</span></div>
+      <div class="ai-r"><span class="t">AGENTS</span><span class="d"><b>Party compute agents.</b> Each org runs its share of the PSI and secure aggregation. Keys never leave the perimeter.</span></div>
+      <div class="ai-r"><span class="t">FLOW</span><span class="d"><b>Agentic containment.</b> Server-enforced state machine drives detection → match → score → approval → receipt.</span></div>
+      <p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8;margin-top:14px">// the intelligence is the model and the orchestration — not a text box</p>
+    </div></div>
+  </div></section>
+
+  <section class="sec cta-blk reveal"><span class="eyebrow" style="margin-bottom:8px;display:block">See it run</span><h2>Watch three weak signals become one proven campaign.</h2><p>Open the operator console and run a protected sweep: three fragments in, one coordinated ring out, zero raw records shared.</p>
+  <div class="btns" style="justify-content:center"><a class="btn btn-p" href="/console.html">Open the console &rarr;</a><a class="btn btn-g" href="/architecture.html">Read the architecture</a></div></section>
+</div>
+
+<footer class="foot"><div class="foot-in"><span>&Phi;YLAX v2.0</span><span style="color:#1E2DFF">raw_records_shared = 0</span><span>synthetic demo &middot; real PSI + MPC &middot; InsForge control plane</span></div></footer>
+
+<script src="/assets/animations.js"></script>
+<script src="https://d3js.org/d3.v7.min.js">
+</script>
+<script>
+(function(){
+  var frame = document.querySelector('.globe-wrap');
+  var canvas = frame && frame.querySelector('canvas');
+  if(!canvas) return;
+
+  var ctx = canvas.getContext('2d');
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var containerWidth, containerHeight, radius, baseRadius;
+  var projection, path;
+  var landFeatures = null, allDots = [];
+  var rotation = [0, 0], autoRotate = true;
+  var rotationTimer;
+
+  function resize(){
+    var r = frame.getBoundingClientRect();
+    containerWidth = r.width; containerHeight = r.height;
+    canvas.width = containerWidth * dpr; canvas.height = containerHeight * dpr;
+    canvas.style.width = containerWidth + 'px'; canvas.style.height = containerHeight + 'px';
+    ctx.setTransform(1,0,0,1,0,0); ctx.scale(dpr, dpr);
+    radius = Math.min(containerWidth, containerHeight) / 2.5;
+    baseRadius = radius;
+    if(projection) projection.scale(radius).translate([containerWidth/2, containerHeight/2]);
+  }
+
+  function setupProjection(){
+    projection = d3.geoOrthographic().scale(radius).translate([containerWidth/2, containerHeight/2]).clipAngle(90);
+    path = d3.geoPath().projection(projection).context(ctx);
+  }
+
+  // ── point-in-polygon ──────────────────────────────────
+  function pip(point, polygon){
+    var x=point[0], y=point[1], inside=false;
+    for(var i=0,j=polygon.length-1;i<polygon.length;j=i++){
+      var xi=polygon[i][0],yi=polygon[i][1],xj=polygon[j][0],yj=polygon[j][1];
+      if((yi>y)!==(yj>y) && x<(xj-xi)*(y-yi)/(yj-yi)+xi) inside=!inside;
+    }
+    return inside;
+  }
+
+  function pointInFeature(point, feature){
+    var g=feature.geometry;
+    if(!g) return false;
+    if(g.type==='Polygon'){
+      if(!pip(point, g.coordinates[0])) return false;
+      for(var i=1;i<g.coordinates.length;i++) if(pip(point, g.coordinates[i])) return false;
+      return true;
+    }
+    if(g.type==='MultiPolygon'){
+      for(var p=0;p<g.coordinates.length;p++){
+        if(pip(point, g.coordinates[p][0])){
+          var hole=false;
+          for(var h=1;h<g.coordinates[p].length;h++) if(pip(point, g.coordinates[p][h])){hole=true;break}
+          if(!hole) return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  function generateDots(feature, spacing){
+    spacing=spacing||16;
+    var b=d3.geoBounds(feature), step=spacing*0.08, dots=[];
+    for(var lng=b[0][0];lng<=b[1][0];lng+=step)
+      for(var lat=b[0][1];lat<=b[1][1];lat+=step)
+        if(pointInFeature([lng,lat],feature)) dots.push({lng:lng, lat:lat});
+    return dots;
+  }
+
+  // ── render ─────────────────────────────────────────────
+  function render(){
+    ctx.clearRect(0, 0, containerWidth, containerHeight);
+    var scale=projection.scale(), sf=scale/baseRadius;
+
+    // Ocean
+    ctx.beginPath(); ctx.arc(containerWidth/2, containerHeight/2, scale, 0, 2*Math.PI);
+    ctx.fillStyle='#F8F9FB'; ctx.fill();
+    ctx.strokeStyle='rgba(0,0,0,0.08)'; ctx.lineWidth=1.2*sf; ctx.stroke();
+
+    if(landFeatures){
+      // Graticule
+      ctx.beginPath(); path(d3.geoGraticule()());
+      ctx.strokeStyle='rgba(0,0,0,0.05)'; ctx.lineWidth=0.5*sf; ctx.globalAlpha=0.5; ctx.stroke(); ctx.globalAlpha=1;
+
+      // Land outlines
+      ctx.beginPath();
+      landFeatures.features.forEach(function(f){ path(f); });
+      ctx.strokeStyle='rgba(0,0,0,0.12)'; ctx.lineWidth=0.6*sf; ctx.stroke();
+
+      // Halftone dots — blue
+      allDots.forEach(function(d){
+        var p=projection([d.lng, d.lat]);
+        if(p && p[0]>=0 && p[0]<=containerWidth && p[1]>=0 && p[1]<=containerHeight){
+          ctx.beginPath(); ctx.arc(p[0], p[1], 1*sf, 0, 2*Math.PI);
+          ctx.fillStyle='#1E2DFF'; ctx.globalAlpha=0.3; ctx.fill(); ctx.globalAlpha=1;
+        }
+      });
+    }
+  }
+
+  // ── load data ──────────────────────────────────────────
+  function loadData(){
+    fetch('https://raw.githubusercontent.com/martynafford/natural-earth-geojson/refs/heads/master/110m/physical/ne_110m_land.json')
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        landFeatures = data;
+        data.features.forEach(function(f){
+          generateDots(f, 16).forEach(function(d){ allDots.push(d); });
+        });
+        render();
+      })
+      .catch(function(){ render(); });
+  }
+
+  // ── rotation ───────────────────────────────────────────
+  function startRotation(){
+    rotationTimer = d3.timer(function(){
+      if(autoRotate){ rotation[0] += 0.4; projection.rotate(rotation); render(); }
+    });
+  }
+
+  // ── mouse/touch ────────────────────────────────────────
+  function onDown(e){
+    autoRotate = false;
+    var sx=e.clientX, sy=e.clientY, sr=rotation.slice();
+    function onMove(ev){
+      rotation[0] = sr[0] + (ev.clientX - sx) * 0.5;
+      rotation[1] = sr[1] - (ev.clientY - sy) * 0.5;
+      rotation[1] = Math.max(-90, Math.min(90, rotation[1]));
+      projection.rotate(rotation); render();
+    }
+    function onUp(){
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      setTimeout(function(){ autoRotate = true; }, 600);
+    }
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    canvas.style.cursor = 'grabbing';
+  }
+  function onWheel(e){
+    e.preventDefault();
+    var ns = Math.max(baseRadius*0.5, Math.min(baseRadius*3, projection.scale() * (e.deltaY>0?0.9:1.1)));
+    projection.scale(ns); render();
+  }
+  function onTouchStart(e){
+    if(e.touches.length===1){
+      autoRotate=false;
+      var sx=e.touches[0].clientX, sy=e.touches[0].clientY, sr=rotation.slice();
+      function onTM(ev){
+        rotation[0]=sr[0]+(ev.touches[0].clientX-sx)*0.5;
+        rotation[1]=sr[1]-(ev.touches[0].clientY-sy)*0.5;
+        rotation[1]=Math.max(-90,Math.min(90,rotation[1]));
+        projection.rotate(rotation); render();
+      }
+      function onTE(){ document.removeEventListener('touchmove',onTM); document.removeEventListener('touchend',onTE); setTimeout(function(){autoRotate=true},600); }
+      document.addEventListener('touchmove',onTM,{passive:false});
+      document.addEventListener('touchend',onTE);
+    }
+  }
+
+  canvas.style.cursor='grab'; canvas.style.touchAction='none';
+  canvas.addEventListener('mousedown', onDown);
+  canvas.addEventListener('wheel', onWheel, {passive:false});
+  canvas.addEventListener('touchstart', onTouchStart, {passive:false});
+
+  // ── init ───────────────────────────────────────────────
+  resize(); setupProjection(); render(); loadData(); startRotation();
+  new ResizeObserver(function(){ resize(); render(); }).observe(frame);
+})();
+</script>
+</body>
+</html>

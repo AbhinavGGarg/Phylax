@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>ΦYLAX · Built on InsForge</title>
+<style>
+*{box-sizing:border-box;margin:0}
+html{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased}
+body{background:#F8F9FB;color:#0A0A1A;font-size:15px;line-height:1.6;letter-spacing:-.01em}
+.nav-bar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,.06)}
+.nav-in{max-width:1160px;margin:0 auto;padding:12px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.nav-l{display:flex;align-items:center;gap:14px}
+.logo{display:inline-flex;align-items:center;gap:.35ch;font-weight:730;font-size:21px;color:#0A0A1A;text-decoration:none}
+.logo .s{font-family:'JetBrains Mono',monospace;color:#1E2DFF;font-weight:600}
+.nav-tag{font-size:13px;color:#999AA8;border-left:1px solid rgba(0,0,0,.06);padding-left:14px}
+.nav-links{display:flex;gap:1px}
+.nav-links a{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.05em;color:#555566;padding:7px 11px;border-radius:4px;text-decoration:none;text-transform:uppercase;transition:.15s}
+.nav-links a:hover{color:#0A0A1A;background:rgba(0,0,0,.04)}
+.nav-links a.act{color:#1E2DFF;background:#EEF0FF;font-weight:520}
+.wrap{max-width:1040px;margin:0 auto;padding:0 28px}
+.sec{padding:80px 0}.sec+.sec{border-top:1px solid rgba(0,0,0,.06)}
+.hd{margin-bottom:32px}
+.hd .eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#999AA8;display:block;margin-bottom:8px}
+.hd h2{font-size:clamp(22px,2.6vw,30px);font-weight:650;letter-spacing:-.025em;margin-bottom:10px}
+.hd p{font-size:16px;color:#555566;line-height:1.6}
+.head{padding:clamp(40px,5vw,70px) 0 4px}
+.head h1{font-size:clamp(30px,4.5vw,52px);font-weight:660;letter-spacing:-.04em;line-height:1}
+.p{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);overflow:hidden}
+.p-pd{padding:20px 24px}
+.p-hd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-bottom:1px solid rgba(0,0,0,.06);font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8;text-transform:uppercase;letter-spacing:.06em}
+.tag{display:inline-flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.04em;padding:3px 8px;border-radius:4px;border:1px solid rgba(0,0,0,.1);color:#555566;text-transform:uppercase}
+.tag.b{color:#1E2DFF;border-color:rgba(30,45,255,.2);background:#EEF0FF}
+.stmt{padding:26px 28px 26px 30px;position:relative;overflow:hidden}
+.stmt:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#1E2DFF,rgba(30,45,255,.2))}
+.stmt .q{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#999AA8;margin-bottom:14px}
+.stmt p{font-size:clamp(15px,1.7vw,19px);line-height:1.62;color:#0A0A1A}
+.stmt .sig{margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8}
+table{width:100%;border-collapse:collapse}
+table caption{text-align:left;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#999AA8;padding-bottom:10px}
+table th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#999AA8;font-weight:500;padding:0 14px 10px 0;border-bottom:1px solid rgba(0,0,0,.1)}
+table td{padding:13px 14px 13px 0;border-bottom:1px solid rgba(0,0,0,.06);vertical-align:top}
+table td.k{font-family:'JetBrains Mono',monospace;font-size:12px;color:#1E2DFF;white-space:nowrap;width:1%}
+table td.r{font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8;white-space:nowrap;width:1%}
+table td.u{font-size:13px;color:#555566;line-height:1.55}
+table td.u b{color:#0A0A1A;font-weight:600}
+table td.u .m{font-family:'JetBrains Mono',monospace;font-size:11px;color:#0A0A1A}
+table tr:hover td{background:rgba(30,45,255,.03)}
+.trk{display:grid;gap:10px}
+.tr{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;padding:18px 20px}
+.tr .no{font-family:'JetBrains Mono',monospace;font-size:13px;color:#555566}
+.tr .ttl{font-size:15px;font-weight:650}.tr .ds{font-size:13px;color:#555566;margin-top:3px;line-height:1.5}
+.tr .bdg{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.06em;padding:4px 10px;border-radius:3px;border:1px solid rgba(0,0,0,.1);color:#555566;white-space:nowrap;text-transform:uppercase}
+.tr .bdg.pri{color:#fff;font-weight:600;border:0;background:#1E2DFF}
+.tr .bdg.cmp{color:#1E2DFF;border-color:rgba(30,45,255,.25);background:#EEF0FF}
+.cta-blk{text-align:center;padding:80px 0}
+.cta-blk h2{font-size:clamp(24px,3vw,36px);margin-bottom:12px}
+.cta-blk p{margin:0 auto 24px;max-width:50ch;color:#555566;font-size:16px}
+.btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-weight:560;font-size:14px;padding:13px 25px;border-radius:8px;cursor:pointer;transition:.18s;text-decoration:none;line-height:1;border:none}
+.btn-p{background:#1E2DFF;color:#fff;box-shadow:0 1px 3px rgba(30,45,255,.25),0 6px 20px rgba(30,45,255,.18)}
+.btn-p:hover{background:#2A3AFF;transform:translateY(-1px)}
+.btn-g{background:transparent;color:#0A0A1A;border:1.5px solid rgba(0,0,0,.1)}
+.btn-g:hover{border-color:#1E2DFF;color:#1E2DFF;background:#EEF0FF}
+.foot{border-top:1px solid rgba(0,0,0,.06);background:#fff}
+.foot-in{max-width:1040px;margin:0 auto;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8}
+@media(max-width:760px){.nav-tag{display:none}.tr{grid-template-columns:auto 1fr;gap:10px}.tr .bdg{grid-column:2;justify-self:start}table td.r,table th.r{display:none}}
+</style>
+</head>
+<body>
+
+<header class="nav-bar"><div class="nav-in">
+  <div class="nav-l"><a href="/" class="logo"><span class="s">&Phi;</span>YLAX</a><span class="nav-tag">Built on InsForge</span></div>
+  <nav class="nav-links"><a href="/">Home</a><a href="/console.html">Console</a><a href="/architecture.html">Arch</a><a href="/sponsor.html" class="act">Sponsor</a><a href="/partner.html">Partner</a></nav>
+</div></header>
+
+<div class="wrap">
+  <section class="sec head rev-up" style="border-top:0"><span class="eyebrow" style="margin-bottom:8px;display:block">Best Use of InsForge · Bay Builders Hackathon</span><h1>Native, not bolted on.</h1><p style="color:#555566;font-size:16px;max-width:58ch;margin-top:14px">Phylax could not exist as a stack of loosely-wired services. The whole product is a trust boundary with a state machine and a live stream — exactly the shape InsForge has.</p></section>
+
+  <section class="sec" style="padding-top:4px;border-top:0"><div class="p stmt reveal d1"><div class="q">The thesis</div><p>Phylax is built natively on InsForge. InsForge <span style="color:#1E2DFF">creates the trust boundaries</span>, <span style="color:#1E2DFF">hosts the long-running protected-compute services</span>, <span style="color:#1E2DFF">enforces access controls</span>, <span style="color:#1E2DFF">persists the auditable decision ledger</span>, <span style="color:#1E2DFF">streams the live incident response</span>, <span style="color:#1E2DFF">stores private artifacts</span>, and <span style="color:#1E2DFF">deploys the control plane</span>.</p><div class="sig">— live on <span style="color:#1E2DFF">kd6vibk3</span></div></div></section>
+
+  <section class="sec"><div class="hd reveal"><h2>Every InsForge primitive, doing containment work.</h2></div>
+  <table><caption>InsForge product → Phylax usage</caption><thead><tr><th>InsForge</th><th class="r">layer</th><th>How Phylax uses it</th></tr></thead><tbody>
+  <tr><td class="k">Auth + RLS</td><td class="r">boundary</td><td class="u"><b>Creates trust boundaries.</b> 6 roles across 4 orgs. Partner cannot read another's private batches.</td></tr>
+  <tr><td class="k">Postgres</td><td class="r">ledger</td><td class="u"><b>Persists decision ledger.</b> 13 tables, monotonic state machine. <span class="m">raw_records_shared = 0</span>.</td></tr>
+  <tr><td class="k">Edge Functions</td><td class="r">workflow</td><td class="u"><b>Drives workflow.</b> 8 functions with HMAC-SHA256 + nonce replay protection.</td></tr>
+  <tr><td class="k">Custom Compute</td><td class="r">compute</td><td class="u"><b>Hosts compute.</b> Dockerized SecretFlow party services for PSI + secure aggregation.</td></tr>
+  <tr><td class="k">Realtime</td><td class="r">stream</td><td class="u"><b>Streams incidents.</b> <span class="m">run:</span> / <span class="m">org:</span> channels, safe metadata only, RLS-gated.</td></tr>
+  <tr><td class="k">Storage</td><td class="r">artifacts</td><td class="u"><b>Stores artifacts.</b> Private <span class="m">phylax-artifacts</span> bucket. DB: pointers + checksums only.</td></tr>
+  <tr><td class="k">Branching</td><td class="r">safety</td><td class="u"><b>Guards changes.</b> Schema-only security branch for RLS and state-machine edits.</td></tr>
+  <tr><td class="k">Sites</td><td class="r">deploy</td><td class="u"><b>Deploys control plane.</b> Same project governs both data and frontend.</td></tr>
+  </tbody></table></section>
+
+  <section class="sec"><div class="hd reveal"><h2>One build, three tracks.</h2></div><div class="trk">
+    <div class="p tr reveal"><span class="no">01</span><div><div class="ttl">AI SaaS / B2B</div><div class="ds">Subscription trust-&amp;-safety for banks, marketplaces, messengers — recurring revenue on shared fraud loss.</div></div><span class="bdg pri">primary</span></div>
+    <div class="p tr reveal"><span class="no">03</span><div><div class="ttl">AI Agent Company</div><div class="ds">Autonomous party agents. Agentic workflow: detect → match → score → approve → receipt.</div></div><span class="bdg cmp">compatible</span></div>
+    <div class="p tr reveal"><span class="no">04</span><div><div class="ttl">Vertical AI</div><div class="ds">Purpose-built for financial-crime and platform trust-&amp;-safety.</div></div><span class="bdg cmp">compatible</span></div>
+  </div></section>
+
+  <section class="sec cta-blk"><span class="eyebrow" style="margin-bottom:8px;display:block">See it</span><h2>The proof is in the pipeline.</h2><p>Run a protected sweep or read how the boundary holds.</p>
+  <div class="btns"><a class="btn btn-p" href="/console.html">Open the console &rarr;</a><a class="btn btn-g" href="/architecture.html">Read the architecture</a></div></section>
+</div>
+
+<footer class="foot"><div class="foot-in"><span>&Phi;YLAX v2.0</span><span style="color:#1E2DFF">Best Use of InsForge</span><span>synthetic demo · real PSI + MPC</span></div></footer>
+<script src="/assets/animations.js"></script>
+</body>
+</html>
