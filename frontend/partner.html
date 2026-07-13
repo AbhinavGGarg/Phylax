@@ -63,13 +63,15 @@ h1{font-family:'JetBrains Mono',monospace;font-size:24px;margin:2px 0 4px}
 
 <footer class="foot"><div class="foot-in"><span>&Phi;YLAX · Partner View</span><span style="color:#1E2DFF">RLS · Isolated</span><span>synthetic demo · real PSI + MPC</span></div></footer>
 
+<script src="/config.js"></script>
 <script>
 var $=function(s){return document.querySelector(s)},N={fintrust:'FinTrust Bank',swiftcart:'SwiftCart Marketplace',pingline:'PingLine Messaging'};
+var API=(window.PHYLAX&&window.PHYLAX.base)||'',ANON=(window.PHYLAX&&window.PHYLAX.anon)||'';
 function load(slug){
   document.querySelectorAll('#switch button').forEach(function(b){b.classList.toggle('on',b.dataset.org===slug)});
   $('h1').textContent=N[slug];
   $('#batches').innerHTML=$('#runs').innerHTML='<p style="font-family:JetBrains Mono,monospace;font-size:10px;color:#999AA8">Loading…</p>';
-  fetch('/api/partner/'+slug).then(function(r){return r.json()}).then(function(d){
+  fetch(API+'/functions/demo-partner',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ANON},body:JSON.stringify({slug:slug})}).then(function(r){return r.json()}).then(function(d){
     $('#commitTag').textContent=d.ownCommitments+' commitments';
     $('#batches').innerHTML=d.ownBatches.length?d.ownBatches.map(function(b){return '<div class="row"><span>'+b.label+'</span><span class="m">'+b.signal_count+' signals</span></div>'}).join(''):'<p style="font-family:JetBrains Mono,monospace;font-size:10px;color:#999AA8">No batches yet.</p>';
     $('#runs').innerHTML=d.runs.length?d.runs.map(function(x){return '<div class="row"><span class="m">'+x.id.slice(0,8)+'</span><span>'+(x.status||'—')+(x.risk_score!=null?' · risk '+(x.risk_score*100).toFixed(1)+'%':'')+'</span></div>'}).join(''):'<p style="font-family:JetBrains Mono,monospace;font-size:10px;color:#999AA8">No runs visible.</p>';

@@ -52,6 +52,8 @@
       else el.textContent = isFloat ? target.toFixed(decimals) + '%' : target;
     }
     requestAnimationFrame(step);
+    // safety net: guarantee the final value even if rAF is throttled mid-count
+    setTimeout(function(){ el.textContent = isFloat ? target.toFixed(decimals) + '%' : target; }, duration + 300);
   }
 
   // ── counter observer ──────────────────────────────────
@@ -72,9 +74,22 @@
     });
   }
 
+  // ── safety net: never leave above-the-fold content hidden ──
+  // (IntersectionObserver can be slow/throttled on first paint; reveal anything
+  //  already in the initial viewport immediately so the hero is never blank.)
+  function revealInView(){
+    var vh = window.innerHeight || 800;
+    document.querySelectorAll('.'+PX+', .rev-fade, .rev-up, .rev-left, .rev-right, .rev-scale').forEach(function(el){
+      if(el.getBoundingClientRect().top < vh * 0.95) el.classList.add('is-visible');
+    });
+  }
+
   // ── run ────────────────────────────────────────────────
   observeAll();
   observeCounters();
+  revealInView();
+  setTimeout(revealInView, 60);
+  window.addEventListener('load', revealInView);
 
   // re-run on DOM changes (for dynamic content)
   window._animRefresh = function(){

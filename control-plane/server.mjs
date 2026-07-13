@@ -17,7 +17,7 @@ import {
 import { DEMO_PASSWORD } from "../scripts/_env.mjs";
 
 const PORT = Number(process.env.PORT || 8890);
-const WEB = join(cfg.root, "web");
+const WEB = join(cfg.root, "frontend");
 
 const REALTIME_EVENTS = [
   "run.created", "party.ready", "protected_match.started", "protected_match.completed",
