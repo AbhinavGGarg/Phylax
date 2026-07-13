@@ -100,6 +100,13 @@ export function env(name: string, fallback?: string): string {
 export function admin() {
   return createAdminClient({ baseUrl: env("INSFORGE_BASE_URL"), apiKey: env("API_KEY") });
 }
+// A signed-in user client (used by demo-partner to read under that org's RLS).
+export async function demoUserClient(email: string, password: string) {
+  const c = createClient({ baseUrl: env("INSFORGE_BASE_URL"), anonKey: env("ANON_KEY") });
+  await c.auth.signInWithPassword({ email, password });
+  return c;
+}
+
 export async function currentUser(req: Request): Promise<{ id: string } | null> {
   const auth = req.headers.get("Authorization");
   const token = auth?.startsWith("Bearer ") ? auth.slice(7) : null;
@@ -157,6 +164,17 @@ export async function orgIndex(db: ReturnType<typeof admin>) {
 export async function getRun(db: ReturnType<typeof admin>, runId: string) {
   const { data } = await db.database.from("detection_runs").select("*").eq("id", runId).limit(1);
   return data?.[0] ?? null;
+}
+
+// Resolve a seeded DEMO actor (user_id + org_id) for a role — used by the
+// anon-callable demo-* functions to act on behalf of the demo operator/approvers.
+export async function demoActor(db: ReturnType<typeof admin>, orgSlug: string, roles: string[]) {
+  const { data: orgs } = await db.database.from("organizations").select("id").eq("slug", orgSlug).limit(1);
+  const orgId = orgs?.[0]?.id;
+  if (!orgId) return null;
+  const { data: members } = await db.database.from("organization_members").select("user_id, role").eq("org_id", orgId);
+  const hit = (members ?? []).find((m: any) => roles.includes(m.role));
+  return hit ? { userId: hit.user_id, orgId, role: hit.role } : null;
 }
 
 export async function handle(req: Request, fn: (req: Request) => Promise<Response>): Promise<Response> {

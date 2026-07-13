@@ -26,10 +26,10 @@
 <div class="wrap">
   <header class="bar">
     <div style="display:flex;align-items:center;gap:16px">
-      <a class="wordmark" href="/"><span class="phi">Φ</span>YLAX</a>
+      <a class="wordmark" href="index.html"><span class="phi">Φ</span>YLAX</a>
       <span class="eyebrow" style="border-left:1px solid var(--line);padding-left:14px">Partner-restricted view</span>
     </div>
-    <nav class="nav" style="display:flex;gap:2px"><a href="/console">Console</a><a href="/architecture">Architecture</a><a href="/sponsor">Sponsor</a></nav>
+    <nav class="nav" style="display:flex;gap:2px"><a href="console.html">Console</a><a href="architecture.html">Architecture</a><a href="sponsor.html">Sponsor</a></nav>
   </header>
 
   <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap">
@@ -65,14 +65,16 @@
   </div>
   <p class="muted mono" style="text-align:center;font-size:11px;opacity:.6;margin-top:26px">synthetic / demo topology · real PSI + MPC · live InsForge control plane</p>
 </div>
+<script src="/config.js"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 const NAMES = { fintrust: "FinTrust Bank", swiftcart: "SwiftCart Marketplace", pingline: "PingLine Messaging" };
+const API = (window.PHYLAX && window.PHYLAX.base) || "", ANON = (window.PHYLAX && window.PHYLAX.anon) || "";
 async function load(slug) {
   document.querySelectorAll("#switch button").forEach((b) => b.classList.toggle("on", b.dataset.org === slug));
   $("#orgName").textContent = NAMES[slug];
   $("#batches").innerHTML = $("#runs").innerHTML = `<p class="muted">Loading…</p>`;
-  const r = await fetch(`/api/partner/${slug}`); const d = await r.json();
+  const r = await fetch(`${API}/functions/demo-partner`, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${ANON}` }, body: JSON.stringify({ slug }) }); const d = await r.json();
   $("#commitTag").textContent = `${d.ownCommitments} commitments`;
   $("#batches").innerHTML = (d.ownBatches.length ? d.ownBatches.map((b) =>
     `<div class="row"><span>${b.label}</span><span class="m">${b.signal_count} signals</span></div>`).join("")

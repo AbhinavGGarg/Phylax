@@ -42,10 +42,10 @@ customer record, then coordinate the smallest human-approved intervention.
 
 ## Links
 
+- **▶ Live demo (InsForge Sites): https://kd6vibk3.insforge.site** — the whole app runs on InsForge; the sweep executes real PSI/MPC in an edge function.
 - Live control plane (InsForge): `https://kd6vibk3.us-east.insforge.app`
-- Local console: `http://localhost:8890/console` (run `npm run dev`)
-- Repo: `https://github.com/karthikpottabathini1-bot/Phylax` *(push pending — see below)*
-- Demo script + architecture: `README.md`, `/architecture`
+- Repo: `https://github.com/AbhinavGGarg/Phylax`
+- Demo script + architecture: `README.md`, https://kd6vibk3.insforge.site/architecture.html
 
 ## 90-second demo
 

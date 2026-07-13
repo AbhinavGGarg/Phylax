@@ -78,7 +78,7 @@ async function orchestrateSweep(runId, coord) {
 // ---- HTTP ----
 const MIME = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript",
   ".svg": "image/svg+xml", ".json": "application/json", ".woff2": "font/woff2", ".png": "image/png" };
-const ROUTES = { "/": "landing.html", "/console": "console.html", "/partner": "partner.html",
+const ROUTES = { "/": "index.html", "/console": "console.html", "/partner": "partner.html",
   "/architecture": "architecture.html", "/sponsor": "sponsor.html" };
 
 function sendJSON(res, code, obj) {

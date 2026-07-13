@@ -11,8 +11,8 @@ const fnDir = join(root, "insforge", "functions");
 const srcDir = join(fnDir, "src");
 const distDir = join(fnDir, "_dist");
 
-const core = readFileSync(join(fnDir, "_shared", "core.ts"), "utf8");
-const IMPORT_RE = /import\s*\{[\s\S]*?\}\s*from\s*["']\.\.\/_shared\/core\.ts["'];?/;
+// inline ANY `import { ... } from "../_shared/<name>.(ts|js)"` by pasting that file
+const SHARED_RE = /import\s*\{[\s\S]*?\}\s*from\s*["']\.\.\/_shared\/([\w.-]+)["'];?/g;
 
 rmSync(distDir, { recursive: true, force: true });
 mkdirSync(distDir, { recursive: true });
@@ -20,13 +20,16 @@ mkdirSync(distDir, { recursive: true });
 const slugs = readdirSync(srcDir).filter((f) => f.endsWith(".ts"));
 for (const file of slugs) {
   const src = readFileSync(join(srcDir, file), "utf8");
-  if (!IMPORT_RE.test(src)) {
-    console.error(`✗ ${file}: no core import found`);
+  if (!SHARED_RE.test(src)) {
+    console.error(`✗ ${file}: no _shared import found`);
     process.exit(1);
   }
-  const banner = `// ⚠ GENERATED — edit insforge/functions/src/${file} + _shared/core.ts, then\n`
+  const banner = `// ⚠ GENERATED — edit insforge/functions/src/${file} + _shared/*, then\n`
     + `//   run: node scripts/build-functions.mjs\n`;
-  let out = src.replace(IMPORT_RE, `\n/* ---- inlined _shared/core.ts ---- */\n${core}\n/* ---- end core ---- */\n`);
+  let out = src.replace(SHARED_RE, (_m, name) => {
+    const content = readFileSync(join(fnDir, "_shared", name), "utf8");
+    return `\n/* ---- inlined _shared/${name} ---- */\n${content}\n/* ---- end ${name} ---- */\n`;
+  });
   out = banner + out;
   if (/\.\.\/_shared\//.test(out)) {
     console.error(`✗ ${file}: unresolved _shared import remains after inlining`);

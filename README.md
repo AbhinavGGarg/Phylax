@@ -7,6 +7,12 @@ Phylax is a privacy-preserving, real-time **collective campaign-containment netw
 > Built for the **Bay Builders Hackathon** ("Build your own AI company"), targeting **Best Use of InsForge**.
 > InsForge is the operating system; **SecretFlow** performs the privacy-preserving computation.
 
+### ▶ Live demo — **https://kd6vibk3.insforge.site**
+
+The whole product runs on InsForge: the frontend is served from **InsForge Sites**, and clicking **Run Protected Sweep** ([/console.html](https://kd6vibk3.insforge.site/console.html)) executes the **real** DDH-PSI + secure aggregation + risk model inside an **InsForge Edge Function** (`demo-sweep`), writing through the live Postgres state machine. No server of ours, no local process — just InsForge. (Pages: [landing](https://kd6vibk3.insforge.site/), [console](https://kd6vibk3.insforge.site/console.html), [architecture](https://kd6vibk3.insforge.site/architecture.html), [sponsor](https://kd6vibk3.insforge.site/sponsor.html), [partner RLS view](https://kd6vibk3.insforge.site/partner.html).)
+
+> The hosted edge compute uses the standard **RFC 2409 1024-bit MODP** safe prime for edge-function latency (~1.3 s/sweep) — the same DDH-PSI protocol; the repo's local Python backend uses full **2048-bit MODP**, and production uses **SecretFlow SPU** ECDH-PSI.
+
 ---
 
 ## The one thing to understand
