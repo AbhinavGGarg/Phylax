@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>ΦYLAX · Prove the campaign. Share nothing.</title>
+<title>Phylax · Prove the campaign. Share nothing.</title>
 <style>
 *{box-sizing:border-box;margin:0}
 html{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
@@ -114,7 +114,7 @@ h1 .dim{color:#555566}
 <body>
 
 <header class="nav-bar"><div class="nav-in">
-  <div class="nav-l"><a href="/" class="logo"><span class="s">&Phi;</span>YLAX</a><span class="nav-tag">Collective Campaign Containment</span></div>
+  <div class="nav-l"><a href="/" class="logo"><span class="s">&Phi;</span>PHYLAX</a><span class="nav-tag">Collective Campaign Containment</span></div>
   <nav class="nav-links">
     <a href="/" class="act">Home</a>
     <a href="/architecture.html">Arch</a>
@@ -130,7 +130,7 @@ h1 .dim{color:#555566}
     <div class="hero-accent rev-up"><span>Privacy-preserving trust &amp; safety network</span><span class="dash"></span></div>
     <h1 class="rev-up d1">Prove the campaign.<br><span class="dim">Share nothing.</span></h1>
     <p class="lede rev-up d2">Three companies each hold a scam fragment too weak to act on alone. Phylax lets them prove a single coordinated campaign together — without exposing customer identities, raw messages, private watchlists, or embeddings.</p>
-    <div class="btns rev-up d3"><a class="btn btn-p" href="/console.html">Open the console &rarr;</a><a class="btn btn-g" href="/how-it-works.html">How it works</a></div>
+    <div class="btns rev-up d3"><a class="btn btn-p" href="/console.html">Open the console &rarr;</a><a class="btn btn-g" href="/architecture.html">How it works</a></div>
     <div class="hero-note rev-up d4"><span class="ac">data moves</span><span style="width:22px;height:1px;background:rgba(0,0,0,.1);display:inline-block"></span>0 is shared</div>
   </div>
 </section>
@@ -157,7 +157,7 @@ h1 .dim{color:#555566}
 
   <section class="sec"><div class="hd reveal"><span class="eyebrow">Audit</span><h2>What is running — and what is honestly still a demo.</h2><p>Security products earn trust by being precise about their own limits.</p></div>
   <div class="audit">
-    <div class="p ac reveal d1"><h4><span class="ic bl">&check;</span> Protocol is real</h4><p>DDH-PSI executes locally; SecretFlow SPU ECDH_PSI_3PC in production. Non-matching tokens hidden by DDH assumption. Coordinator never sees a raw identifier.</p></div>
+    <div class="p ac reveal d1"><h4><span class="ic bl">&check;</span> Protocol is real</h4><p>2048-bit MODP DDH-PSI locally; a 1024-bit MODP group inside the InsForge edge function for the hosted demo. Non-matching tokens hidden by the DDH assumption. The coordinator never sees a raw identifier.</p></div>
     <div class="p ac reveal d2"><h4><span class="ic bl">&check;</span> Model is trained</h4><p>Logistic regression fitted offline by gradient descent, verified to reproduce from seed. Shipped with feature spec and params hash. Not an LLM.</p></div>
     <div class="p ac reveal d3"><h4><span class="ic bl">&check;</span> Zero raw records</h4><p>raw_records_shared = 0 is a hard database invariant enforced by trigger. Never a message, identity, account number, watchlist, or vector enters the neutral plane.</p></div>
     <div class="p ac reveal d4"><h4><span class="ic am">&excl;</span> Topology is staged</h4><p>Single-account demo with synthetic data. Proves protocol and product — <b style="color:#0A0A1A;font-weight:600">not</b> adversarial infrastructure isolation. Production: per-org projects with independent key material.</p></div>
@@ -186,7 +186,7 @@ h1 .dim{color:#555566}
   <div class="btns" style="justify-content:center"><a class="btn btn-p" href="/console.html">Open the console &rarr;</a><a class="btn btn-g" href="/architecture.html">Read the architecture</a></div></section>
 </div>
 
-<footer class="foot"><div class="foot-in"><span>&Phi;YLAX v2.0</span><span style="color:#1E2DFF">raw_records_shared = 0</span><span>synthetic demo &middot; real PSI + MPC &middot; InsForge control plane</span></div></footer>
+<footer class="foot"><div class="foot-in"><span>Phylax v2.0</span><span style="color:#1E2DFF">raw_records_shared = 0</span><span>synthetic demo &middot; real PSI + MPC &middot; InsForge control plane</span></div></footer>
 
 <script src="/assets/animations.js"></script>
 <script src="https://d3js.org/d3.v7.min.js">
