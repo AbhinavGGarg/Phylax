@@ -4,83 +4,89 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Phylax · Partner View</title>
+<link rel="stylesheet" href="/assets/phylax.css"/>
 <style>
-*{box-sizing:border-box;margin:0}
-html{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased}
-body{background:#F8F9FB;color:#0A0A1A;font-size:15px;line-height:1.6;letter-spacing:-.01em}
-.nav-bar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,.06)}
-.nav-in{max-width:1160px;margin:0 auto;padding:12px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.nav-l{display:flex;align-items:center;gap:14px}
-.logo{display:inline-flex;align-items:center;gap:.35ch;font-weight:730;font-size:21px;color:#0A0A1A;text-decoration:none}
-.logo .s{font-family:'JetBrains Mono',monospace;color:#1E2DFF;font-weight:600}
-.nav-tag{font-size:13px;color:#999AA8;border-left:1px solid rgba(0,0,0,.06);padding-left:14px}
-.nav-links{display:flex;gap:1px}
-.nav-links a{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.05em;color:#555566;padding:7px 11px;border-radius:4px;text-decoration:none;text-transform:uppercase;transition:.15s}
-.nav-links a:hover{color:#0A0A1A;background:rgba(0,0,0,.04)}
-.nav-links a.act{color:#1E2DFF;background:#EEF0FF;font-weight:520}
-.wrap{max-width:1160px;margin:0 auto;padding:28px 28px 80px}
-.eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#999AA8;display:block;margin-bottom:4px}
-h1{font-family:'JetBrains Mono',monospace;font-size:24px;margin:2px 0 4px}
-.switch{display:flex;gap:4px}
-.switch button{font-family:'JetBrains Mono',monospace;font-size:11px;padding:9px 15px;border-radius:8px;border:1px solid rgba(0,0,0,.1);background:#fff;color:#555566;cursor:pointer;transition:.15s}
-.switch button:hover{border-color:#1E2DFF;color:#1E2DFF}
-.switch button.on{background:#1E2DFF;color:#fff;border-color:#1E2DFF;font-weight:520}
-.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
-.p{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);overflow:hidden}
-.p-hd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-bottom:1px solid rgba(0,0,0,.06);font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8;text-transform:uppercase;letter-spacing:.06em}
-.p-pd{padding:20px 24px}
-.row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px dashed rgba(0,0,0,.06);font-size:12px}
-.row:last-child{border-bottom:0}.row .m{font-family:'JetBrains Mono',monospace;color:#0A0A1A}
-.iso{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border:1px solid rgba(220,38,38,.2);border-radius:8px;margin-top:8px;background:rgba(220,38,38,.03)}
-.iso .big{font-family:'JetBrains Mono',monospace;font-size:20px;color:#DC2626}
-.tag{display:inline-flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.04em;padding:3px 8px;border-radius:4px;border:1px solid rgba(0,0,0,.1);color:#555566;text-transform:uppercase}
-.tag.bl{color:#1E2DFF;border-color:rgba(30,45,255,.2);background:#EEF0FF}
-.tag.rd{color:#DC2626;border-color:rgba(220,38,38,.2);background:rgba(220,38,38,.06)}
-.foot{border-top:1px solid rgba(0,0,0,.06);background:#fff;position:fixed;bottom:0;left:0;right:0}
-.foot-in{max-width:1160px;margin:0 auto;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8}
-@media(max-width:820px){.cols{grid-template-columns:1fr}.nav-tag{display:none}}
+  .wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:22px 24px 60px}
+  header.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:26px}
+  .nav a{font-size:12.5px;color:var(--dim);padding:6px 10px;border-radius:8px}.nav a:hover{color:var(--ink);background:rgba(20,29,49,.6)}
+  .switch{display:flex;gap:8px}
+  .switch button{font-family:var(--mono);font-size:12.5px;padding:8px 14px;border-radius:9px;border:1px solid var(--line);background:rgba(20,29,49,.6);color:var(--dim);cursor:pointer}
+  .switch button.on{color:#04121a;background:linear-gradient(180deg,#5ff0e4,#22c4c0);border:0;font-weight:640}
+  h1{font-size:26px;margin:4px 0 2px}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+  @media(max-width:820px){.cols{grid-template-columns:1fr}}
+  .row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13px}
+  .row:last-child{border-bottom:0}.row .m{font-family:var(--mono);color:var(--ink)}
+  .iso{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border:1px solid rgba(255,77,109,.28);border-radius:10px;margin-top:9px;background:rgba(255,77,109,.05)}
+  .big0{font-family:var(--mono);font-size:22px;color:var(--crimson)}
+  .muted{color:var(--faint);font-size:12.5px}
 </style>
 </head>
-<body style="padding-bottom:60px">
-
-<header class="nav-bar"><div class="nav-in">
-  <div class="nav-l"><a href="/" class="logo"><span class="s">&Phi;</span>PHYLAX</a><span class="nav-tag">Partner-restricted view</span></div>
-  <nav class="nav-links"><a href="/">Home</a><a href="/console.html">Console</a><a href="/architecture.html">Arch</a><a href="/sponsor.html">Sponsor</a></nav>
-</div></header>
-
+<body class="grid-bg">
 <div class="wrap">
+  <header class="bar">
+    <div style="display:flex;align-items:center;gap:16px">
+      <a class="wordmark" href="index.html"><span class="phi">Φ</span>PHYLAX</a>
+      <span class="eyebrow" style="border-left:1px solid var(--line);padding-left:14px">Partner-restricted view</span>
+    </div>
+    <nav class="nav" style="display:flex;gap:2px"><a href="console.html">Console</a><a href="architecture.html">Architecture</a><a href="sponsor.html">Sponsor</a></nav>
+  </header>
+
   <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap">
-    <div><span class="eyebrow rev-up">Signed in as</span><h1 id="orgName" class="rev-up d1">FinTrust Bank</h1><p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8;margin-top:4px">Everything this organization can see — enforced by InsForge RLS.</p></div>
-    <div class="switch" id="switch"><button data-org="fintrust" class="on">FinTrust</button><button data-org="swiftcart">SwiftCart</button><button data-org="pingline">PingLine</button></div>
+    <div>
+      <div class="eyebrow">Signed in as</div>
+      <h1 id="orgName">FinTrust Bank</h1>
+      <p class="muted" id="orgSub">Everything this organization can see — enforced by InsForge Row-Level Security, not by the UI.</p>
+    </div>
+    <div class="switch" id="switch">
+      <button data-org="fintrust" class="on">FinTrust</button>
+      <button data-org="swiftcart">SwiftCart</button>
+      <button data-org="pingline">PingLine</button>
+    </div>
   </div>
+
   <div class="cols">
-    <div class="p reveal d1"><div class="p-hd">Private signal batches <span class="tag bl" id="commitTag">—</span></div><div class="p-pd" id="batches"><p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8">Loading…</p></div></div>
-    <div class="p reveal d2"><div class="p-hd">Runs you participate in</div><div class="p-pd" id="runs"><p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8">Loading…</p></div></div>
+    <div class="panel">
+      <div class="panel-hd"><span class="eyebrow">Your private signal batches</span><span class="tag cy" id="commitTag">—</span></div>
+      <div class="panel-pad" id="batches"><p class="muted">Loading…</p></div>
+    </div>
+    <div class="panel">
+      <div class="panel-hd"><span class="eyebrow">Runs you participate in</span></div>
+      <div class="panel-pad" id="runs"><p class="muted">Loading…</p></div>
+    </div>
   </div>
-  <div class="p reveal d3" style="margin-top:14px"><div class="p-hd">Isolation proof · what you cannot see <span class="tag rd">RLS enforced</span></div><div class="p-pd"><p style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8;margin-bottom:4px">Direct queries to other members' private batches. RLS returns nothing.</p><div id="isolation"></div></div></div>
-  <p style="font-family:'JetBrains Mono',monospace;font-size:10px;text-align:center;color:#999AA8;margin-top:24px">synthetic demo · real PSI + MPC · InsForge control plane</p>
+
+  <div class="panel" style="margin-top:16px">
+    <div class="panel-hd"><span class="eyebrow">Isolation proof · what you cannot see</span><span class="tag cr">RLS enforced</span></div>
+    <div class="panel-pad">
+      <p class="muted" style="margin:0 0 4px">You queried the other members' private batches directly. Row-Level Security returns nothing.</p>
+      <div id="isolation"></div>
+    </div>
+  </div>
+  <p class="muted mono" style="text-align:center;font-size:11px;opacity:.6;margin-top:26px">synthetic / demo topology · real PSI + MPC · live InsForge control plane</p>
 </div>
-
-<footer class="foot"><div class="foot-in"><span>Phylax · Partner View</span><span style="color:#1E2DFF">RLS · Isolated</span><span>synthetic demo · real PSI + MPC</span></div></footer>
-
 <script src="/config.js"></script>
 <script>
-var $=function(s){return document.querySelector(s)},N={fintrust:'FinTrust Bank',swiftcart:'SwiftCart Marketplace',pingline:'PingLine Messaging'};
-var API=(window.PHYLAX&&window.PHYLAX.base)||'',ANON=(window.PHYLAX&&window.PHYLAX.anon)||'';
-function load(slug){
-  document.querySelectorAll('#switch button').forEach(function(b){b.classList.toggle('on',b.dataset.org===slug)});
-  $('h1').textContent=N[slug];
-  $('#batches').innerHTML=$('#runs').innerHTML='<p style="font-family:JetBrains Mono,monospace;font-size:10px;color:#999AA8">Loading…</p>';
-  fetch(API+'/functions/demo-partner',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ANON},body:JSON.stringify({slug:slug})}).then(function(r){return r.json()}).then(function(d){
-    $('#commitTag').textContent=d.ownCommitments+' commitments';
-    $('#batches').innerHTML=d.ownBatches.length?d.ownBatches.map(function(b){return '<div class="row"><span>'+b.label+'</span><span class="m">'+b.signal_count+' signals</span></div>'}).join(''):'<p style="font-family:JetBrains Mono,monospace;font-size:10px;color:#999AA8">No batches yet.</p>';
-    $('#runs').innerHTML=d.runs.length?d.runs.map(function(x){return '<div class="row"><span class="m">'+x.id.slice(0,8)+'</span><span>'+(x.status||'—')+(x.risk_score!=null?' · risk '+(x.risk_score*100).toFixed(1)+'%':'')+'</span></div>'}).join(''):'<p style="font-family:JetBrains Mono,monospace;font-size:10px;color:#999AA8">No runs visible.</p>';
-    $('#isolation').innerHTML=d.isolation.map(function(i){return '<div class="iso"><span>'+i.name+' · private batches</span><span class="big">'+i.rowsVisible+'</span></div>'}).join('');
-  }).catch(function(){$('#batches').innerHTML=$('#runs').innerHTML='<p style="font-family:JetBrains Mono,monospace;font-size:10px;color:#CC6C00">Backend offline</p>'});
+const $ = (s) => document.querySelector(s);
+const NAMES = { fintrust: "FinTrust Bank", swiftcart: "SwiftCart Marketplace", pingline: "PingLine Messaging" };
+const API = (window.PHYLAX && window.PHYLAX.base) || "", ANON = (window.PHYLAX && window.PHYLAX.anon) || "";
+async function load(slug) {
+  document.querySelectorAll("#switch button").forEach((b) => b.classList.toggle("on", b.dataset.org === slug));
+  $("#orgName").textContent = NAMES[slug];
+  $("#batches").innerHTML = $("#runs").innerHTML = `<p class="muted">Loading…</p>`;
+  const r = await fetch(`${API}/functions/demo-partner`, { method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${ANON}` }, body: JSON.stringify({ slug }) }); const d = await r.json();
+  $("#commitTag").textContent = `${d.ownCommitments} commitments`;
+  $("#batches").innerHTML = (d.ownBatches.length ? d.ownBatches.map((b) =>
+    `<div class="row"><span>${b.label}</span><span class="m">${b.signal_count} signals</span></div>`).join("")
+    : `<p class="muted">No batches yet. Run a sweep in the console.</p>`);
+  $("#runs").innerHTML = (d.runs.length ? d.runs.map((x) =>
+    `<div class="row"><span class="m">${x.id.slice(0, 8)}</span><span>${x.status}${x.risk_score != null ? " · risk " + (x.risk_score * 100).toFixed(1) + "%" : ""}</span></div>`).join("")
+    : `<p class="muted">No runs visible yet.</p>`);
+  $("#isolation").innerHTML = d.isolation.map((i) =>
+    `<div class="iso"><span>${i.name} · private batches</span><span class="big0">${i.rowsVisible}</span></div>`).join("");
 }
-document.querySelectorAll('#switch button').forEach(function(b){b.onclick=function(){load(b.dataset.org)}});
-load('fintrust');
+document.querySelectorAll("#switch button").forEach((b) => b.onclick = () => load(b.dataset.org));
+load("fintrust");
 </script>
-<script src="/assets/animations.js"></script>
 </body>
 </html>

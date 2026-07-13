@@ -3,138 +3,260 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Phylax · Built on InsForge</title>
+<title>Phylax · Built natively on InsForge</title>
+<meta name="description" content="Why Phylax is built natively on InsForge: the trust boundary, the protected-compute host, the decision ledger, the live incident stream, and the deploy target — one control plane."/>
+<link rel="stylesheet" href="/assets/phylax.css"/>
 <style>
-*{box-sizing:border-box;margin:0}
-html{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased}
-body{background:#F8F9FB;color:#0A0A1A;font-size:15px;line-height:1.6;letter-spacing:-.01em}
-.nav-bar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,.06)}
-.nav-in{max-width:1160px;margin:0 auto;padding:12px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.nav-l{display:flex;align-items:center;gap:14px}
-.logo{display:inline-flex;align-items:center;gap:.35ch;font-weight:730;font-size:21px;color:#0A0A1A;text-decoration:none}
-.logo .s{font-family:'JetBrains Mono',monospace;color:#1E2DFF;font-weight:600}
-.nav-tag{font-size:13px;color:#999AA8;border-left:1px solid rgba(0,0,0,.06);padding-left:14px}
-.nav-links{display:flex;gap:1px}
-.nav-links a{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.05em;color:#555566;padding:7px 11px;border-radius:4px;text-decoration:none;text-transform:uppercase;transition:.15s}
-.nav-links a:hover{color:#0A0A1A;background:rgba(0,0,0,.04)}
-.nav-links a.act{color:#1E2DFF;background:#EEF0FF;font-weight:520}
-.wrap{max-width:1040px;margin:0 auto;padding:0 28px}
-.sec{padding:74px 0}.sec+.sec{border-top:1px solid rgba(0,0,0,.06)}
-.hd{margin-bottom:30px}
-.hd .eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#999AA8;display:block;margin-bottom:8px}
-.hd h2{font-size:clamp(22px,2.6vw,30px);font-weight:650;letter-spacing:-.025em;margin-bottom:10px}
-.hd p{font-size:16px;color:#555566;line-height:1.6;max-width:64ch}
-.head{padding:clamp(44px,5vw,74px) 0 6px}
-.head h1{font-size:clamp(32px,4.6vw,54px);font-weight:660;letter-spacing:-.04em;line-height:1}
-.head h1 .bl{color:#1E2DFF}
-.p{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);overflow:hidden}
-.stmt{padding:26px 28px 26px 30px;position:relative;overflow:hidden}
-.stmt:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#1E2DFF,rgba(30,45,255,.2))}
-.stmt .q{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#999AA8;margin-bottom:14px}
-.stmt p{font-size:clamp(15px,1.7vw,19px);line-height:1.62;color:#0A0A1A}
-.stmt .hl{color:#1E2DFF}
-.stmt .sig{margin-top:16px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8}
-table{width:100%;border-collapse:collapse}
-table caption{text-align:left;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#999AA8;padding-bottom:10px}
-table th{text-align:left;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#999AA8;font-weight:500;padding:0 14px 10px 0;border-bottom:1px solid rgba(0,0,0,.1)}
-table td{padding:14px 14px 14px 0;border-bottom:1px solid rgba(0,0,0,.06);vertical-align:top}
-table td.k{font-family:'JetBrains Mono',monospace;font-size:12px;color:#1E2DFF;white-space:nowrap;width:1%;font-weight:600}
-table td.r{font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8;white-space:nowrap;width:1%}
-table td.u{font-size:13.5px;color:#555566;line-height:1.55}
-table td.u b{color:#0A0A1A;font-weight:600}
-table td.u .m{font-family:'JetBrains Mono',monospace;font-size:11px;color:#0A0A1A}
-table tr:hover td{background:rgba(30,45,255,.03)}
-.why{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.why .card{padding:22px 24px}
-.why .card h4{font-size:15px;font-weight:650;margin-bottom:6px}
-.why .card p{font-size:13.5px;color:#555566;line-height:1.55}
-.why .card .m{font-family:'JetBrains Mono',monospace;color:#1E2DFF;font-size:12px}
-.strip{display:flex;flex-wrap:wrap;gap:14px 30px;justify-content:center;padding:20px 28px;margin-top:10px}
-.strip .i{display:flex;flex-direction:column;align-items:center;gap:2px}
-.strip .i .v{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:650;color:#0A0A1A}
-.strip .i .v.bl{color:#1E2DFF}
-.strip .i .l{font-family:'JetBrains Mono',monospace;font-size:9px;color:#999AA8;letter-spacing:.04em;text-transform:uppercase}
-.cta-blk{text-align:center;padding:74px 0}
-.cta-blk h2{font-size:clamp(24px,3vw,36px);margin-bottom:12px}
-.cta-blk p{margin:0 auto 24px;max-width:52ch;color:#555566;font-size:16px}
-.btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-weight:560;font-size:14px;padding:13px 25px;border-radius:8px;cursor:pointer;transition:.18s;text-decoration:none;line-height:1;border:none}
-.btn-p{background:#1E2DFF;color:#fff;box-shadow:0 1px 3px rgba(30,45,255,.25),0 6px 20px rgba(30,45,255,.18)}
-.btn-p:hover{background:#2A3AFF;transform:translateY(-1px)}
-.btn-g{background:transparent;color:#0A0A1A;border:1.5px solid rgba(0,0,0,.1)}
-.btn-g:hover{border-color:#1E2DFF;color:#1E2DFF;background:#EEF0FF}
-.foot{border-top:1px solid rgba(0,0,0,.06);background:#fff}
-.foot-in{max-width:1040px;margin:0 auto;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8}
-@media(max-width:760px){.nav-tag{display:none}.why{grid-template-columns:1fr}table td.r,table th.r{display:none}}
+  :root{ --maxw:1080px }
+  a:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:6px}
+
+  /* ---- shared shell ---- */
+  .top{position:sticky;top:0;z-index:30;backdrop-filter:blur(12px);
+    background:linear-gradient(180deg,rgba(5,7,14,.9),rgba(5,7,14,.55));border-bottom:1px solid var(--line)}
+  .top .in{max-width:var(--maxw);margin:0 auto;display:flex;align-items:center;justify-content:space-between;
+    gap:14px;padding:13px 24px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:16px;min-width:0}
+  .brand .tagline{border-left:1px solid var(--line);padding-left:16px}
+  .nav{display:flex;gap:2px;flex-wrap:wrap}
+  .nav a{font-size:13px;color:var(--dim);padding:7px 11px;border-radius:8px;transition:.15s}
+  .nav a:hover{color:var(--ink);background:rgba(20,29,49,.6)}
+  .nav a[aria-current="page"]{color:var(--ink);background:rgba(20,29,49,.72)}
+  .wrap{position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  section{padding:clamp(44px,6.5vw,80px) 0;border-top:1px solid var(--line)}
+  section:first-of-type{border-top:0}
+  .sec-hd{max-width:720px;margin-bottom:28px}
+  .sec-hd h2{font-size:clamp(23px,3vw,34px);margin-top:12px}
+  .sec-hd .lede{margin-top:13px}
+
+  .head{padding:clamp(42px,6vw,76px) 0 6px}
+  .head h1{font-size:clamp(32px,5vw,60px);font-weight:700;letter-spacing:-0.04em;line-height:1}
+  .head .lede{margin-top:18px;max-width:60ch}
+
+  /* ---- verbatim statement ---- */
+  .statement{position:relative;padding:30px 30px 30px 34px;overflow:hidden}
+  .statement::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
+    background:linear-gradient(180deg,var(--cyan),var(--iris))}
+  .statement .q{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--faint);margin-bottom:16px}
+  .statement p{font-size:clamp(17px,2vw,22px);line-height:1.62;letter-spacing:-0.01em;margin:0;color:var(--ink)}
+  .statement p .hl{color:#8ff3ea}
+  .statement p .sf{color:var(--iris)}
+  .statement .sig{margin-top:18px;font-family:var(--mono);font-size:12px;color:var(--faint)}
+
+  /* ---- product -> usage table ---- */
+  .tbl{width:100%;border-collapse:collapse;margin-top:4px}
+  .tbl caption{text-align:left;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--faint);padding-bottom:12px}
+  .tbl th{text-align:left;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--faint);font-weight:500;padding:0 16px 12px 0;border-bottom:1px solid var(--line-2)}
+  .tbl td{padding:15px 16px 15px 0;border-bottom:1px solid var(--line);vertical-align:top}
+  .tbl td.k{font-family:var(--mono);font-size:13px;color:var(--cyan);white-space:nowrap;width:1%}
+  .tbl td.role{font-size:12px;color:var(--faint);white-space:nowrap;width:1%;font-family:var(--mono)}
+  .tbl td.u{font-size:13.5px;color:var(--dim);line-height:1.55}
+  .tbl td.u b{color:var(--ink);font-weight:600}
+  .tbl td.u .mono{font-family:var(--mono);font-size:12.5px;color:var(--ink)}
+  .tbl tr:hover td{background:rgba(20,29,49,.28)}
+
+  /* ---- tracks ---- */
+  .tracks{display:grid;gap:12px}
+  .track{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;padding:18px 20px}
+  .track .no{font-family:var(--mono);font-size:13px;color:var(--dim)}
+  .track .ttl{font-size:15px;font-weight:600;letter-spacing:-.01em}
+  .track .ds{font-size:13px;color:var(--dim);margin-top:3px;line-height:1.5}
+  .track .badge{font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:5px 11px;border-radius:999px;
+    border:1px solid var(--line-2);color:var(--dim);white-space:nowrap}
+  .track .badge.pri{color:#04121a;font-weight:680;border:0;background:linear-gradient(180deg,#5ff0e4,#22c4c0)}
+  .track .badge.cmp{color:#8ff3ea;border-color:rgba(53,224,212,.35);background:rgba(53,224,212,.07)}
+
+  /* ---- cta + footer ---- */
+  .cta{display:flex;gap:12px;flex-wrap:wrap}
+  .close{padding:clamp(48px,7vw,90px) 0}
+  .close h2{font-size:clamp(25px,3.4vw,40px);letter-spacing:-.03em;max-width:20ch}
+  .close .lede{margin:15px 0 24px;max-width:54ch}
+  .foot{border-top:1px solid var(--line)}
+  .foot .in{max-width:var(--maxw);margin:0 auto;padding:26px 24px;display:flex;flex-wrap:wrap;gap:14px;
+    align-items:center;justify-content:space-between}
+  .foot .topo{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.02em}
+  .foot .lk{display:flex;gap:16px}
+  .foot .lk a{font-size:12.5px;color:var(--dim)} .foot .lk a:hover{color:var(--ink)}
+
+  @media(max-width:760px){
+    .brand .tagline{display:none}
+    .track{grid-template-columns:auto 1fr;gap:12px}
+    .track .badge{grid-column:2;justify-self:start}
+    .tbl td.role{display:none}
+    .tbl th.role{display:none}
+  }
 </style>
 </head>
-<body>
+<body class="grid-bg">
 
-<header class="nav-bar"><div class="nav-in">
-  <div class="nav-l"><a href="/" class="logo"><span class="s">&Phi;</span>PHYLAX</a><span class="nav-tag">Built on InsForge</span></div>
-  <nav class="nav-links"><a href="/">Home</a><a href="/console.html">Console</a><a href="/architecture.html">Arch</a><a href="/sponsor.html" class="act">Sponsor</a><a href="/partner.html">Partner</a></nav>
-</div></header>
+<header class="top">
+  <div class="in">
+    <div class="brand">
+      <span class="wordmark"><span class="phi">Φ</span>PHYLAX</span>
+      <span class="eyebrow tagline">Built on InsForge</span>
+    </div>
+    <nav class="nav" aria-label="Primary">
+      <a href="index.html">Home</a>
+      <a href="console.html">Console</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="sponsor.html" aria-current="page">Sponsor</a>
+    </nav>
+  </div>
+</header>
 
-<div class="wrap">
-  <section class="sec head rev-up" style="border-top:0">
-    <span class="eyebrow" style="margin-bottom:8px;display:block">Best Use of InsForge · Bay Builders Hackathon</span>
-    <h1>Phylax runs on <span class="bl">InsForge</span>.<br/>Every single layer.</h1>
-    <p style="color:#555566;font-size:16px;max-width:64ch;margin-top:16px">This is not InsForge for a login and a table. Phylax is a trust boundary between rival companies, a monotonic state machine, an append-only ledger, long-running cryptographic compute, and a live incident stream — and InsForge is <b>every one of those things</b>, in one project, behind one set of credentials. We didn't glue services together. We built on the platform that is already shaped like the product.</p>
+<main class="wrap">
+
+  <section class="head" style="border-top:0">
+    <span class="eyebrow">Best Use of InsForge · Bay Builders Hackathon</span>
+    <h1>Native, not bolted on.</h1>
+    <p class="lede">Phylax could not exist as a stack of loosely-wired services. The whole product <em>is</em> a
+      trust boundary with a state machine, an audit ledger, and a live stream running through it — which is
+      exactly the shape InsForge has.</p>
   </section>
 
-  <section class="sec" style="padding-top:4px;border-top:0">
-    <div class="p stmt reveal d1">
+  <!-- ======================= VERBATIM STATEMENT ======================= -->
+  <section style="border-top:0;padding-top:8px">
+    <div class="panel statement">
       <div class="q">The thesis</div>
-      <p>Phylax is built natively on InsForge. InsForge <span class="hl">creates the trust boundaries</span> between organizations, <span class="hl">hosts the long-running protected-compute services</span>, <span class="hl">enforces access controls</span>, <span class="hl">persists the auditable decision ledger</span>, <span class="hl">streams the live incident response</span>, <span class="hl">stores private artifacts</span>, and <span class="hl">deploys the control plane</span> — the very page you're reading included.</p>
-      <div class="sig">— live on project <span style="color:#1E2DFF">kd6vibk3</span> · kd6vibk3.us-east.insforge.app</div>
+      <p>Phylax is built natively on InsForge. InsForge <span class="hl">creates the trust boundaries</span>
+        between organizations, <span class="hl">hosts the long-running protected-compute services</span>,
+        <span class="hl">enforces access controls</span>, <span class="hl">persists the auditable decision
+        ledger</span>, <span class="hl">streams the live incident response</span>, <span class="hl">stores
+        private artifacts</span>, and <span class="hl">deploys the control plane</span>. Phylax's own
+        privacy-preserving computation runs on that foundation; <span class="sf">InsForge makes that computation a usable, trusted
+        product.</span></p>
+      <div class="sig">— live on project <span style="color:var(--cyan)">kd6vibk3</span> · https://kd6vibk3.us-east.insforge.app</div>
     </div>
   </section>
 
-  <section class="sec">
-    <div class="hd reveal"><span class="eyebrow">The mapping</span><h2>Every InsForge primitive, doing containment work.</h2><p>Not a name-drop. Load-bearing — remove any one row and Phylax stops being a product.</p></div>
-    <table>
+  <!-- ======================= PRODUCT -> USAGE TABLE ======================= -->
+  <section>
+    <div class="sec-hd">
+      <span class="eyebrow">The mapping</span>
+      <h2>Every InsForge primitive, doing containment work.</h2>
+      <p class="lede">Each verb in the statement above resolves to a specific InsForge capability carrying a
+        specific load in the pipeline.</p>
+    </div>
+
+    <table class="tbl">
       <caption>InsForge product → Phylax usage</caption>
-      <thead><tr><th>InsForge</th><th class="r">layer</th><th>How Phylax leans on it</th></tr></thead>
+      <thead>
+        <tr><th scope="col">InsForge</th><th scope="col" class="role">layer</th><th scope="col">How Phylax uses it</th></tr>
+      </thead>
       <tbody>
-        <tr><td class="k">Auth + RLS</td><td class="r">boundary</td><td class="u"><b>The trust boundary itself.</b> 6 roles across 4 orgs. Row-Level Security turns "FinTrust can't read SwiftCart's data" into a database law, not a code convention — and a passing isolation test proves it.</td></tr>
-        <tr><td class="k">Postgres</td><td class="r">ledger</td><td class="u"><b>A control plane with opinions.</b> 13 tables behind a monotonic, trigger-enforced state machine; append-only audit + finding ledgers; <span class="m">raw_records_shared = 0</span> is a hard invariant the database physically refuses to break.</td></tr>
-        <tr><td class="k">Edge Functions</td><td class="r">workflow</td><td class="u"><b>The whole API, server-side and tamper-resistant.</b> 8 functions run the pipeline; the worker callback verifies HMAC-SHA256 + a timestamp window + a single-use nonce + a forbidden-field scan before it ever touches a row.</td></tr>
-        <tr><td class="k">Realtime</td><td class="r">stream</td><td class="u"><b>Live incident response, for free.</b> <span class="m">run:</span> and <span class="m">org:</span> channels carry safe metadata only — phase, score, cardinality, the 0 counter — with subscription gated by RLS.</td></tr>
-        <tr><td class="k">Storage</td><td class="r">artifacts</td><td class="u"><b>Private artifacts, zero leakage.</b> A private <span class="m">phylax-artifacts</span> bucket holds signed incident receipts; the database keeps pointers + checksums, never the evidence itself.</td></tr>
-        <tr><td class="k">Custom Compute</td><td class="r">compute</td><td class="u"><b>Long-running protected compute, containerized.</b> Dockerized party compute services run each org's share of the PSI + secure aggregation, right beside that org's own data.</td></tr>
-        <tr><td class="k">Branching</td><td class="r">safety</td><td class="u"><b>Ship RLS changes without fear.</b> A schema-only security branch validates policy and state-machine edits in isolation before they ever touch production.</td></tr>
-        <tr><td class="k">Sites</td><td class="r">deploy</td><td class="u"><b>One project, front to back.</b> This page and the operator console deploy from the same InsForge project that governs the data. No second cloud. No glue.</td></tr>
+        <tr>
+          <td class="k">Auth + RLS</td><td class="role">boundary</td>
+          <td class="u"><b>Creates the trust boundaries.</b> 6 roles across 4 orgs; a partner can never read
+            another partner's private signal batches or commitments. Every write is authorized from membership,
+            not a client-supplied id.</td>
+        </tr>
+        <tr>
+          <td class="k">Postgres</td><td class="role">ledger</td>
+          <td class="u"><b>Persists the auditable decision ledger.</b> 13 tables behind a monotonic,
+            server-enforced state machine; the audit + finding tables are append-only and
+            <span class="mono">raw_records_shared = 0</span> is a hard invariant.</td>
+        </tr>
+        <tr>
+          <td class="k">Edge Functions</td><td class="role">workflow</td>
+          <td class="u"><b>Enforces access controls &amp; drives the workflow.</b> 8 functions run the pipeline
+            — submit → match → score → approve → receipt — with HMAC-SHA256 + timestamp window + single-use
+            nonce replay protection on worker callbacks.</td>
+        </tr>
+        <tr>
+          <td class="k">Custom Compute</td><td class="role">compute</td>
+          <td class="u"><b>Hosts the long-running protected-compute services.</b> Dockerized party compute
+            services (Linux · Python 3.10) run each org's PSI + secure-aggregation share.</td>
+        </tr>
+        <tr>
+          <td class="k">Realtime</td><td class="role">stream</td>
+          <td class="u"><b>Streams the live incident response.</b> <span class="mono">run:</span> and
+            <span class="mono">org:</span> channels carry safe metadata only — phase, score, cardinality, the
+            zero counter — with subscription gated by RLS.</td>
+        </tr>
+        <tr>
+          <td class="k">Storage</td><td class="role">artifacts</td>
+          <td class="u"><b>Stores private artifacts.</b> A private <span class="mono">phylax-artifacts</span>
+            bucket holds input packages, model artifacts, and signed receipts; the DB keeps only pointers +
+            checksums.</td>
+        </tr>
+        <tr>
+          <td class="k">Backend Branching</td><td class="role">safety</td>
+          <td class="u"><b>Guards the boundary changes.</b> A schema-only security branch validates RLS and
+            state-machine edits before they reach the production control plane.</td>
+        </tr>
+        <tr>
+          <td class="k">Sites</td><td class="role">deploy</td>
+          <td class="u"><b>Deploys the control plane.</b> The operator console and this site ship on InsForge
+            Sites, served from the same project that governs the data.</td>
+        </tr>
       </tbody>
     </table>
   </section>
 
-  <section class="sec">
-    <div class="hd reveal"><span class="eyebrow">Why it had to be InsForge</span><h2>The platform is agent-native. So is the product.</h2></div>
-    <div class="why">
-      <div class="p card reveal d1"><h4>It gives you the hard parts</h4><p>Isolated Postgres with real triggers, edge functions, realtime, storage, long-running compute, backend branching, and deploys — behind one set of credentials. The parts that usually take a team and a month were already there.</p></div>
-      <div class="p card reveal d2"><h4>The trust boundary is first-class</h4><p>Phylax's entire premise is "prove the overlap, share nothing." InsForge Auth + RLS make that a property of the database, not a promise in a README. That's the difference between a demo and something a bank would trust.</p></div>
-      <div class="p card reveal d3"><h4>It made a hard product shippable</h4><p>Privacy-preserving multi-party computation, a human-approval workflow, and a tamper-evident ledger — <span class="m">built, deployed, and clickable by a judge</span>. On InsForge that's a weekend. Anywhere else it's a quarter.</p></div>
-      <div class="p card reveal d4"><h4>It's live, not localhost</h4><p>Everything here runs on a real InsForge project right now. Open the console, hit Run Protected Sweep, and watch the state machine, the realtime stream, and the signed receipt do their jobs — no "trust me," no mock.</p></div>
+  <!-- ======================= HACKATHON TRACKS ======================= -->
+  <section>
+    <div class="sec-hd">
+      <span class="eyebrow">Hackathon tracks</span>
+      <h2>One build, three tracks.</h2>
+      <p class="lede">Phylax is a B2B SaaS product first, and it satisfies the agent-company and vertical-AI
+        framings without changing a line.</p>
     </div>
-    <div class="p strip reveal" style="margin-top:14px">
-      <div class="i"><span class="v bl">8</span><span class="l">InsForge products</span></div>
-      <div class="i"><span class="v">13</span><span class="l">tables</span></div>
-      <div class="i"><span class="v">8</span><span class="l">edge functions</span></div>
-      <div class="i"><span class="v">6</span><span class="l">roles</span></div>
-      <div class="i"><span class="v bl">RLS</span><span class="l">on every table</span></div>
-      <div class="i"><span class="v">1</span><span class="l">platform, front to back</span></div>
+
+    <div class="tracks">
+      <div class="panel track">
+        <span class="no">01</span>
+        <div>
+          <div class="ttl">AI SaaS / B2B</div>
+          <div class="ds">A subscription trust-&amp;-safety product sold to a containment consortium of banks,
+            marketplaces, and messaging platforms — recurring revenue on shared fraud loss.</div>
+        </div>
+        <span class="badge pri">primary</span>
+      </div>
+      <div class="panel track">
+        <span class="no">03</span>
+        <div>
+          <div class="ttl">AI Agent Company</div>
+          <div class="ds">Autonomous party agents perform each org's protected computation, and a
+            server-enforced agentic workflow drives detection → match → score → approval → receipt.</div>
+        </div>
+        <span class="badge cmp">compatible</span>
+      </div>
+      <div class="panel track">
+        <span class="no">04</span>
+        <div>
+          <div class="ttl">Vertical AI</div>
+          <div class="ds">Purpose-built for financial-crime and platform trust-&amp;-safety: a federated risk
+            model and a containment workflow tuned to coordinated-scam response, not a general tool.</div>
+        </div>
+        <span class="badge cmp">compatible</span>
+      </div>
     </div>
   </section>
 
-  <section class="sec cta-blk">
-    <span class="eyebrow" style="margin-bottom:8px;display:block">See it run</span>
+  <section class="close">
+    <span class="eyebrow">See it</span>
     <h2>The proof is in the pipeline.</h2>
-    <p>Run a protected sweep on the live console, or watch how the cryptographic match works.</p>
-    <div class="btns"><a class="btn btn-p" href="/console.html">Open the console &rarr;</a><a class="btn btn-g" href="/architecture.html">How it works</a></div>
+    <p class="lede">Run a protected sweep in the console, or read exactly how the boundary holds in the
+      architecture.</p>
+    <div class="cta">
+      <a class="btn btn-primary btn-lg" href="console.html">Open the console</a>
+      <a class="btn btn-lg" href="architecture.html">Read the architecture</a>
+    </div>
   </section>
-</div>
+</main>
 
-<footer class="foot"><div class="foot-in"><span>Phylax · Built natively on InsForge</span><span style="color:#1E2DFF">Best Use of InsForge</span><span>live · kd6vibk3</span></div></footer>
-<script src="/assets/animations.js"></script>
+<footer class="foot">
+  <div class="in">
+    <span class="topo">synthetic / demo topology · real PSI + MPC · live InsForge control plane</span>
+    <span class="lk">
+      <a href="index.html">Home</a>
+      <a href="console.html">Console</a>
+      <a href="architecture.html">Architecture</a>
+    </span>
+  </div>
+</footer>
+
 </body>
 </html>

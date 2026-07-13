@@ -4,205 +4,162 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Phylax · Containment Console</title>
+<link rel="preconnect" href="">
+<link rel="stylesheet" href="/assets/phylax.css"/>
 <style>
-  *{box-sizing:border-box;margin:0}
-  html{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased}
-  body{background:#F8F9FB;color:#0A0A1A;font-size:14px;line-height:1.5;letter-spacing:-.01em;overflow:hidden;height:100vh}
-
-  .app{height:100vh;display:flex;flex-direction:column;padding:10px 14px 8px;gap:8px;max-width:1680px;margin:0 auto}
-
-  .top-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 14px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.04);flex-wrap:wrap}
-  .top-l{display:flex;align-items:center;gap:14px}
-  .logo{display:inline-flex;align-items:center;gap:.35ch;font-weight:730;font-size:19px;letter-spacing:-.03em;color:#0A0A1A;text-decoration:none}
-  .logo .s{font-family:'JetBrains Mono',monospace;color:#1E2DFF;font-weight:600}
-  .top-tag{font-size:12px;color:#999AA8;border-left:1px solid rgba(0,0,0,.06);padding-left:14px;white-space:nowrap}
-  .top-r{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-  .chip{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border:1px solid rgba(0,0,0,.08);border-radius:5px;background:rgba(0,0,0,.02);font-family:'JetBrains Mono',monospace;font-size:10px;color:#555566}
-  .chip .v{color:#0A0A1A;font-weight:520}
-  .chip .z{color:#1E2DFF;font-weight:600}
-  .nav-links{display:flex;gap:1px}
-  .nav-links a{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.05em;color:#555566;padding:7px 11px;border-radius:4px;text-decoration:none;text-transform:uppercase;transition:.15s}
-  .nav-links a:hover{color:#0A0A1A;background:rgba(0,0,0,.04)}
-
-  .grid{display:grid;grid-template-columns:280px 1fr 310px;gap:10px;flex:1;min-height:0}
-  .col{display:flex;flex-direction:column;gap:10px;min-height:0}
+  .app{position:relative;z-index:1;height:100vh;overflow:hidden;display:flex;flex-direction:column;padding:14px 20px 12px;gap:12px;max-width:1640px;margin:0 auto}
+  header.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .tele{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+  .nav a{font-size:12.5px;color:var(--dim);padding:6px 10px;border-radius:8px}
+  .nav a:hover{color:var(--ink);background:rgba(20,29,49,.6)}
+  .grid{display:grid;grid-template-columns:300px 1fr 340px;gap:14px;flex:1;min-height:0}
+  .col{display:flex;flex-direction:column;gap:14px;min-height:0}
   .stage{flex:1;display:flex;flex-direction:column;min-height:0}
-
-  .p{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.04);overflow:hidden}
-  .p-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:1px solid rgba(0,0,0,.06);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.08em;color:#999AA8;text-transform:uppercase}
-  .p-bd{padding:12px 14px;overflow:auto}
-
-  .sig{padding:11px 12px;border:1px solid rgba(0,0,0,.05);border-radius:8px;margin-bottom:7px;transition:.15s}
-  .sig:last-child{margin-bottom:0}
-  .sig:hover{border-color:rgba(0,0,0,.1);background:rgba(0,0,0,.01)}
-  .sig-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px}
-  .sig .who{font-weight:600;font-size:13.5px}
-  .sig .blurb{color:#555566;font-size:11.5px;line-height:1.45;margin-bottom:8px}
-  .sig .risk{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#999AA8}
-  .sig .risk .bar{flex:1;height:4px;border-radius:99px;background:rgba(0,0,0,.04);overflow:hidden}
-  .sig .risk .bar i{display:block;height:100%;border-radius:99px;background:#1E2DFF;transition:width .8s}
-
-  .tl-wrap{flex:1;overflow:auto;padding:4px 2px 4px 0}
-  .tl{display:flex;gap:10px;padding:7px 6px 7px 2px;position:relative;animation:fadeIn .3s ease}
-  .tl .r{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:12px}
-  .tl .r i{width:7px;height:7px;border-radius:50%;margin-top:4px;flex-shrink:0}
-  .tl .r span{flex:1;width:1px;background:rgba(0,0,0,.06);margin:2px 0 -6px}
-  .tl:last-child .r span{display:none}
-  .tl .b{flex:1;min-width:0}
-  .tl .ev{font-size:12px;font-weight:520}
-  .tl .mt{font-family:'JetBrains Mono',monospace;font-size:9px;color:#999AA8;margin-top:1px}
-  .tl.cy .r i{background:#1E2DFF;box-shadow:0 0 8px rgba(30,45,255,.3)}
-  .tl.em .r i{background:#169B5A;box-shadow:0 0 8px rgba(22,155,90,.25)}
-  .tl.am .r i{background:#CC6C00;box-shadow:0 0 8px rgba(204,108,0,.25)}
-  .tl.cr .r i{background:#DC2626;box-shadow:0 0 8px rgba(220,38,38,.25)}
-
-  @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-
+  #verdictPanel{flex-shrink:0}
+  #verdictPanel .verdict{max-height:224px}
+  .drivers,.actions{max-height:150px;overflow:auto}
   svg.graph{width:100%;height:100%;display:block}
-
-  .phase{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid rgba(0,0,0,.06);min-height:40px}
-  .phase .lab{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#1E2DFF;transition:color .3s}
-  .phase .sub{font-family:'JetBrains Mono',monospace;font-size:9px;color:#999AA8;margin-left:auto}
-  .phase .dot{width:7px;height:7px;border-radius:50%;background:#1E2DFF;box-shadow:0 0 8px rgba(30,45,255,.3);flex-shrink:0}
-  .phase .dot.idle{background:#c0c0d0;box-shadow:none}
-
-  .verdict-grid{display:grid;grid-template-columns:1.1fr 1fr 1.1fr;gap:12px}
-  .drivers .r2{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:11px}
-  .drivers .r2 .nm{width:120px;color:#555566;flex-shrink:0;font-family:'JetBrains Mono',monospace;font-size:10px}
-  .drivers .r2 .bar{flex:1;height:4px;border-radius:99px;background:rgba(0,0,0,.04);overflow:hidden}
-  .drivers .r2 .vv{font-family:'JetBrains Mono',monospace;width:36px;text-align:right;font-size:10px;color:#0A0A1A}
-  .actions .act{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid rgba(0,0,0,.06);border-radius:7px;margin-bottom:6px}
-  .act .lbl{font-size:12px}
-  .act .s{font-family:'JetBrains Mono',monospace;font-size:9px;color:#999AA8}
-  .boundary{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(0,0,0,.06);border-radius:8px;overflow:hidden}
-  .boundary>div{background:#F8F9FB;padding:10px 12px}
-  .boundary h4{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
-  .boundary .keep h4{color:#1E2DFF}
-  .boundary .never h4{color:#DC2626}
-  .boundary li{font-size:11px;color:#555566;margin:3px 0;list-style:none;padding-left:14px;position:relative}
-  .boundary li:before{content:"";position:absolute;left:0;top:5px;width:5px;height:5px;border-radius:1px}
-  .boundary .keep li:before{background:#1E2DFF}
-  .boundary .never li:before{background:#DC2626}
-
-  .tag{display:inline-flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.06em;padding:2px 6px;border-radius:3px;border:1px solid rgba(0,0,0,.1);color:#555566;text-transform:uppercase}
-  .tag.cy{color:#1E2DFF;border-color:rgba(30,45,255,.2);background:rgba(30,45,255,.06)}
-  .tag.am{color:#CC6C00;border-color:rgba(204,108,0,.2);background:rgba(204,108,0,.06)}
-  .tag.cr{color:#DC2626;border-color:rgba(220,38,38,.2);background:rgba(220,38,38,.06)}
-  .tag.em{color:#169B5A;border-color:rgba(22,155,90,.2);background:rgba(22,155,90,.06)}
-  .dot{width:6px;height:6px;border-radius:50%;display:inline-block}
-  .dot.on{background:#1E2DFF;box-shadow:0 0 6px rgba(30,45,255,.3)}
-  .dot.warn{background:#CC6C00;box-shadow:0 0 6px rgba(204,108,0,.25)}
-  .dot.bad{background:#DC2626;box-shadow:0 0 6px rgba(220,38,38,.25)}
-  .dot.pulse{animation:pulse 1.6s ease-in-out infinite}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:560;font-size:13px;padding:11px 22px;border-radius:7px;cursor:pointer;transition:.15s;border:none;font-family:inherit;line-height:1}
-  .btn:disabled{opacity:.35;cursor:not-allowed;pointer-events:none}
-  .btn-p{background:#1E2DFF;color:#fff;box-shadow:0 1px 3px rgba(30,45,255,.25),0 6px 18px rgba(30,45,255,.18)}
-  .btn-p:hover:not(:disabled){background:#2A3AFF;transform:translateY(-1px)}
-  .btn-g{background:transparent;color:#0A0A1A;border:1px solid rgba(0,0,0,.12)}
-  .btn-g:hover:not(:disabled){border-color:#1E2DFF;color:#1E2DFF;background:rgba(30,45,255,.06)}
-
-  .kv{display:flex;justify-content:space-between;gap:10px;font-size:11.5px;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.04)}
-  .kv:last-child{border-bottom:0}
-  .kv .k{color:#999AA8}
-  .kv .v{font-family:'JetBrains Mono',monospace;color:#0A0A1A}
+  .signal{padding:13px 14px;border:1px solid var(--line);border-radius:11px;background:rgba(12,18,32,.6);margin-bottom:10px}
+  .signal:last-child{margin-bottom:0}
+  .signal .top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .signal .org{font-weight:600;font-size:14px} .signal .mod{font-size:11px}
+  .signal .blurb{color:var(--dim);font-size:12.5px;margin:7px 0 9px;line-height:1.45}
+  .solo{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--faint)}
+  .solo .meter{flex:1}
+  .timeline{overflow:auto;padding:6px 4px 6px 0}
+  .tl{display:flex;gap:11px;padding:9px 6px 9px 2px;position:relative}
+  .tl .rail{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:16px}
+  .tl .rail i{width:9px;height:9px;border-radius:50%;background:var(--faint);margin-top:4px;flex-shrink:0}
+  .tl .rail b{flex:1;width:1px;background:var(--line);margin:3px 0 -9px}
+  .tl:last-child .rail b{display:none}
+  .tl .body{flex:1;min-width:0}
+  .tl .ev{font-size:13px;font-weight:520}
+  .tl .mt{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:2px}
+  .tl.cy i{background:var(--cyan);box-shadow:0 0 9px var(--glow-cyan)}
+  .tl.em i{background:var(--emerald)} .tl.am i{background:var(--amber)} .tl.cr i{background:var(--crimson);box-shadow:0 0 9px var(--glow-crim)}
+  .verdict{display:grid;grid-template-columns:1.15fr 1fr 1.15fr;gap:14px}
+  .drivers .row{display:flex;align-items:center;gap:9px;margin:7px 0;font-size:12px}
+  .drivers .row .nm{width:132px;color:var(--dim);flex-shrink:0}
+  .drivers .row .meter{flex:1}
+  .drivers .row .vv{font-family:var(--mono);width:42px;text-align:right;color:var(--ink)}
+  .actions .act{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:9px}
+  .act .lbl{font-size:13px}.act .sub{font-size:11px;color:var(--faint);font-family:var(--mono)}
+  .boundary{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border-radius:11px;overflow:hidden}
+  .boundary > div{background:var(--deep);padding:12px 13px}
+  .boundary h4{font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 8px;font-family:var(--mono)}
+  .boundary li{font-size:12px;color:var(--dim);margin:4px 0;list-style:none;padding-left:16px;position:relative}
+  .boundary li::before{content:"";position:absolute;left:0;top:6px;width:6px;height:6px;border-radius:2px}
+  .boundary .keep li::before{background:var(--cyan)} .boundary .never li::before{background:var(--crimson)}
+  .zero-big{font-family:var(--mono);font-weight:600;font-size:26px;color:var(--cyan);text-shadow:0 0 18px var(--glow-cyan)}
+  .phaseband{display:flex;align-items:center;gap:12px;padding:11px 15px;border-top:1px solid var(--line)}
+  .phaseband .lab{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan)}
+  .muted{color:var(--faint);font-size:12.5px}
   .hidden{display:none!important}
-  .mt{color:#999AA8;font-size:11px}
-
-  @media(max-width:1180px){.grid{grid-template-columns:1fr}.stage{min-height:340px}.verdict-grid{grid-template-columns:1fr}.top-tag{display:none}}
+  @media(max-width:1180px){.grid{grid-template-columns:1fr}.stage{min-height:380px}.verdict{grid-template-columns:1fr}}
 </style>
 </head>
-<body>
-
+<body class="grid-bg">
 <div class="app">
-  <header class="top-bar">
-    <div class="top-l">
-      <a href="/" class="logo"><span class="s">&Phi;</span>PHYLAX</a>
-      <span class="top-tag">Containment Console</span>
+  <header class="bar">
+    <div style="display:flex;align-items:center;gap:18px">
+      <span class="wordmark"><span class="phi">Φ</span>PHYLAX</span>
+      <span class="eyebrow" style="border-left:1px solid var(--line);padding-left:16px">Collective Campaign Containment</span>
     </div>
-    <div class="top-r" id="tele">
-      <span class="chip"><span class="dot on" id="netdot"></span> Network <span class="v" id="nethealth">nominal</span></span>
-      <span class="chip">Participants <span class="v" id="participants">4</span></span>
-      <span class="chip">Sweep <span class="v" id="sweepstate">idle</span></span>
-      <span class="chip" title="Must never move from 0">Raw shared <span class="v z" id="rawcount">0</span></span>
-      <nav class="nav-links"><a href="/">Home</a><a href="/console.html">Console</a><a href="/architecture.html">Arch</a><a href="/sponsor.html">Sponsor</a><a href="/partner.html">Partner</a></nav>
+    <div class="tele" id="tele">
+      <span class="chip"><span class="dot on" id="netdot"></span> Network <span class="val" id="nethealth">nominal</span></span>
+      <span class="chip">Participants <span class="val" id="participants">4</span></span>
+      <span class="chip">Sweep <span class="val" id="sweepstate">idle</span></span>
+      <span class="chip" title="Raw customer records centralized by Phylax. This must never move.">
+        Raw shared <span class="val zero-big" id="rawcount" style="font-size:15px">0</span></span>
+      <nav class="nav" style="display:flex;gap:2px">
+        <a href="index.html">Home</a><a href="architecture.html">Architecture</a><a href="sponsor.html">Sponsor</a><a href="partner.html">Partner view</a>
+      </nav>
     </div>
   </header>
 
   <div class="grid">
+    <!-- LEFT: what each org sees -->
     <div class="col">
-      <div class="p" style="flex:1;display:flex;flex-direction:column">
-        <div class="p-hd">What each organization sees <span class="tag am" id="isoTag">isolated</span></div>
-        <div class="p-bd" id="signals" style="overflow:auto"><p class="mt">Three platforms, three fragments. Each below threshold.</p></div>
+      <div class="panel" style="flex:1;display:flex;flex-direction:column">
+        <div class="panel-hd"><span class="eyebrow">What each organization sees</span><span class="tag am" id="isoTag">isolated</span></div>
+        <div class="panel-pad" id="signals" style="overflow:auto">
+          <p class="muted" style="margin:2px 0 12px">Three platforms, three fragments. Each below its own action threshold.</p>
+        </div>
       </div>
-      <div class="p">
+      <div class="panel">
         <div class="boundary">
-          <div class="keep"><h4>Stored centrally</h4><ul><li>input commitments</li><li>opaque campaign id</li><li>aggregate features</li><li>derived risk score</li><li>proof + receipt hash</li></ul></div>
-          <div class="never"><h4>Never centrally</h4><ul><li>raw messages</li><li>customer identities</li><li>account numbers</li><li>private watchlists</li><li>embeddings / vectors</li></ul></div>
+          <div class="keep"><h4 style="color:#8ff3ea">Stored centrally</h4><ul>
+            <li>input commitments</li><li>opaque campaign id</li><li>permitted aggregate features</li><li>derived risk score</li><li>proof + receipt hash</li></ul></div>
+          <div class="never"><h4 style="color:#ffb3c1">Never stored centrally</h4><ul>
+            <li>raw messages</li><li>customer identities</li><li>account numbers</li><li>private watchlists</li><li>embeddings / vectors</li></ul></div>
         </div>
       </div>
     </div>
 
+    <!-- CENTER: graph -->
     <div class="col">
-      <div class="p stage">
-        <div class="p-hd">Protected topology <span class="tag cy" id="backendTag">psi: modp-ddh</span></div>
+      <div class="panel stage">
+        <div class="panel-hd">
+          <span class="eyebrow">Protected topology · partner space ⟶ trust membrane ⟶ neutral plane</span>
+          <span class="tag cy mono" id="backendTag">psi: modp-ddh</span>
+        </div>
         <div style="flex:1;position:relative;min-height:0">
-          <svg class="graph" viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid meet" id="graph"></svg>
+          <svg class="graph" viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid meet" id="graph" aria-label="Protected network topology"></svg>
         </div>
-        <div class="phase">
-          <span class="dot idle" id="phasedot"></span>
+        <div class="phaseband">
+          <span class="dot pulse" id="phasedot" style="background:var(--faint);box-shadow:none"></span>
           <span class="lab" id="phaselab">standby</span>
-          <span class="sub" id="phasesub"></span>
-          <button class="btn btn-p" id="runBtn" style="margin-left:auto">Run Protected Sweep</button>
+          <span class="muted mono" id="phasesub" style="margin-left:auto"></span>
+          <button class="btn btn-primary btn-lg" id="runBtn">Run Protected Sweep</button>
         </div>
       </div>
     </div>
 
+    <!-- RIGHT: timeline -->
     <div class="col">
-      <div class="p" style="flex:1;display:flex;flex-direction:column;min-height:0">
-        <div class="p-hd">Incident timeline <span class="tag" id="runIdTag">no active run</span></div>
-        <div class="tl-wrap" id="timeline"></div>
+      <div class="panel" style="flex:1;display:flex;flex-direction:column;min-height:0">
+        <div class="panel-hd"><span class="eyebrow">Incident timeline</span><span class="tag" id="runIdTag">no active run</span></div>
+        <div class="timeline" id="timeline" style="flex:1"></div>
       </div>
     </div>
   </div>
 
-  <div class="p" id="verdictPanel" style="flex-shrink:0">
-    <div class="p-hd">Campaign finding <span class="tag" id="verdictTag">awaiting match</span></div>
-    <div class="p-bd verdict-grid">
+  <!-- BOTTOM: verdict -->
+  <div class="panel" id="verdictPanel">
+    <div class="panel-hd"><span class="eyebrow">Campaign finding · confidence · proportionate response</span>
+      <span class="tag" id="verdictTag">awaiting protected match</span></div>
+    <div class="panel-pad verdict">
       <div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#999AA8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Campaign</div>
-        <div id="findingEmpty" class="mt">No campaign proven yet. Run a protected sweep.</div>
+        <div class="eyebrow" style="margin-bottom:9px">Coordinated campaign</div>
+        <div id="findingEmpty" class="muted">No campaign proven yet. Run a protected sweep to test whether the three weak signals share coordinated infrastructure.</div>
         <div id="finding" class="hidden">
-          <div class="kv"><span class="k">Campaign id</span><span class="v" id="fCampaign">&mdash;</span></div>
-          <div class="kv"><span class="k">Shared sigs</span><span class="v" id="fCard">&mdash;</span></div>
-          <div class="kv"><span class="k">Platforms</span><span class="v" id="fParties">&mdash;</span></div>
-          <div class="kv"><span class="k">Proof hash</span><span class="v" id="fProof">&mdash;</span></div>
-          <div class="kv"><span class="k">Raw shared</span><span class="v" style="color:#1E2DFF">0</span></div>
+          <div class="kv"><span class="k">Opaque campaign id</span><span class="v mono" id="fCampaign">—</span></div>
+          <div class="kv"><span class="k">Shared signatures (PSI)</span><span class="v" id="fCard">—</span></div>
+          <div class="kv"><span class="k">Platforms co-observing</span><span class="v" id="fParties">—</span></div>
+          <div class="kv"><span class="k">Signature proof hash</span><span class="v mono" id="fProof">—</span></div>
+          <div class="kv"><span class="k">Raw records shared</span><span class="v" style="color:var(--cyan)">0</span></div>
         </div>
       </div>
       <div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#999AA8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Risk model</div>
-        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:2px">
-          <span style="font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:600;color:#DC2626" id="riskPct">&mdash;</span>
-          <span class="mt" style="font-size:10px">collective &middot; <span id="modelTag" style="font-family:'JetBrains Mono',monospace">phylax-risk 1.0.0</span></span>
+        <div class="eyebrow" style="margin-bottom:9px">Federated risk model</div>
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px">
+          <span class="mono" id="riskPct" style="font-size:40px;font-weight:600;color:var(--crimson)">—</span>
+          <span class="muted">collective risk · <span id="modelTag" class="mono">phylax-risk 1.0.0</span></span>
         </div>
-        <div style="height:5px;border-radius:99px;background:rgba(0,0,0,.04);margin:6px 0 3px;overflow:hidden"><i id="riskBar" style="display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#CC6C00,#DC2626);transition:width .9s"></i></div>
-        <p class="mt" style="font-size:10px;margin-bottom:10px">Confidence <span id="confVal" style="font-family:'JetBrains Mono',monospace">&mdash;</span></p>
+        <div class="meter" style="margin:8px 0 4px"><i id="riskBar" style="width:0;background:linear-gradient(90deg,var(--amber),var(--crimson))"></i></div>
+        <div class="muted" style="font-size:11.5px;margin-bottom:12px">Confidence <span class="mono" id="confVal">—</span> · drivers below are the model's own weighted feature contributions.</div>
         <div class="drivers" id="drivers"></div>
       </div>
       <div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#999AA8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Response</div>
-        <div class="actions" id="actions"><p class="mt">Actions appear once scored. Nothing auto-executes.</p></div>
-        <div id="receiptBox" class="hidden" style="margin-top:4px"></div>
+        <div class="eyebrow" style="margin-bottom:9px">Proportionate response · human approval</div>
+        <div class="actions" id="actions"><div class="muted">Recommended actions appear once the campaign is scored. Nothing executes without a human at the target organization.</div></div>
+        <div id="receiptBox" class="hidden" style="margin-top:6px"></div>
       </div>
     </div>
   </div>
-  <div class="mt" style="text-align:center;font-size:10px" id="topo">synthetic demo &middot; real PSI + MPC &middot; InsForge control plane</div>
+  <div class="muted mono" style="text-align:center;font-size:11px;opacity:.6" id="topo">synthetic / demo topology · real PSI + MPC · live InsForge control plane</div>
 </div>
-
 <script src="/config.js"></script>
 <script src="/assets/console.js"></script>
-<script src="/assets/animations.js"></script>
 </body>
 </html>

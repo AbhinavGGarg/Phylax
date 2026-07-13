@@ -3,153 +3,434 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Phylax · Architecture · How the match works</title>
+<title>Phylax · Architecture &amp; Security</title>
+<meta name="description" content="How Phylax keeps the boundary: InsForge as the neutral control plane, Phylax's own party-side privacy-preserving computation, and only opaque commitments crossing the trust membrane."/>
 <link rel="stylesheet" href="/assets/phylax.css"/>
 <style>
-  html,body{height:100%;overflow:hidden}
-  .stage{position:relative;z-index:1;height:100vh;display:flex;flex-direction:column}
-  header.bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 22px;flex-shrink:0}
-  .nav a{font-size:12.5px;color:var(--dim);padding:6px 10px;border-radius:8px}.nav a:hover{color:var(--ink);background:rgba(20,29,49,.6)}
-  .canvas-wrap{flex:1;position:relative;min-height:0}
-  canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-  .readout{position:absolute;top:14px;right:22px;display:flex;gap:18px;font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.04em;pointer-events:none}
-  .readout b{color:var(--ink);font-weight:500}.readout .m{color:var(--crimson)}.readout .z{color:var(--cyan)}
-  .title{position:absolute;top:20px;left:22px;pointer-events:none}
-  .title .eyebrow{margin-bottom:6px}
-  .title h1{font-size:clamp(19px,2.4vw,28px);letter-spacing:-0.03em;line-height:1.06}
-  .caption{position:absolute;left:0;right:0;bottom:66px;text-align:center;pointer-events:none;padding:0 20px}
-  .caption .step{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--cyan);margin-bottom:8px;opacity:0;transition:opacity .5s}
-  .caption .line{font-size:clamp(15px,2.1vw,22px);font-weight:540;letter-spacing:-0.02em;color:var(--ink);opacity:0;transform:translateY(6px);transition:opacity .6s,transform .6s;max-width:720px;margin:0 auto}
-  .caption.show .step,.caption.show .line{opacity:1;transform:none}
-  .prog{position:absolute;left:6%;right:6%;bottom:52px;height:2px;background:rgba(126,146,184,.16);border-radius:2px;overflow:hidden}
-  .prog>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--iris));border-radius:2px}
-  .controls{position:absolute;left:0;right:0;bottom:18px;display:flex;justify-content:center}
-  @media(max-width:640px){.title{display:none}.readout{gap:10px;font-size:10px}}
+  :root{ --maxw:1180px }
+  a:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:6px}
+
+  /* ---- shared shell ---- */
+  .top{position:sticky;top:0;z-index:30;backdrop-filter:blur(12px);
+    background:linear-gradient(180deg,rgba(5,7,14,.9),rgba(5,7,14,.55));border-bottom:1px solid var(--line)}
+  .top .in{max-width:var(--maxw);margin:0 auto;display:flex;align-items:center;justify-content:space-between;
+    gap:14px;padding:13px 24px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:16px;min-width:0}
+  .brand .tagline{border-left:1px solid var(--line);padding-left:16px}
+  .nav{display:flex;gap:2px;flex-wrap:wrap}
+  .nav a{font-size:13px;color:var(--dim);padding:7px 11px;border-radius:8px;transition:.15s}
+  .nav a:hover{color:var(--ink);background:rgba(20,29,49,.6)}
+  .nav a[aria-current="page"]{color:var(--ink);background:rgba(20,29,49,.72)}
+  .wrap{position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  section{padding:clamp(46px,7vw,88px) 0;border-top:1px solid var(--line)}
+  section:first-of-type{border-top:0}
+  .sec-hd{max-width:760px;margin-bottom:30px}
+  .sec-hd h2{font-size:clamp(24px,3.2vw,38px);margin-top:12px}
+  .sec-hd .lede{margin-top:14px}
+
+  .head{padding:clamp(44px,6vw,80px) 0 8px}
+  .head h1{font-size:clamp(34px,5.2vw,64px);font-weight:700;letter-spacing:-0.04em;line-height:1}
+  .head .lede{margin-top:20px;max-width:64ch}
+
+  /* ---- diagram ---- */
+  .diagram{padding:20px}
+  .diagram svg{width:100%;height:auto;display:block}
+  .dg-card{fill:rgba(12,18,32,.6);stroke:var(--line)}
+  .dg-row{fill:rgba(20,29,49,.5);stroke:var(--line)}
+  .dg-ctrl{fill:rgba(9,14,26,.8);stroke:rgba(53,224,212,.32)}
+  .dg-ctrlhd{fill:rgba(53,224,212,.06);stroke:rgba(53,224,212,.3)}
+  .dg-ctrlrow{fill:rgba(20,29,49,.55);stroke:var(--line)}
+  .dg-t{fill:var(--ink)} .dg-sub{fill:var(--dim)} .dg-faint{fill:var(--faint)}
+  .dg-cy{fill:var(--cyan)} .dg-crim{fill:var(--crimson)}
+  .dg-mono{font-family:var(--mono)} .dg-sans{font-family:var(--sans)}
+  .dg-flow{stroke:var(--cyan);opacity:.5;fill:none} .dg-mem{stroke:rgba(53,224,212,.4)}
+  .legend{display:flex;flex-wrap:wrap;gap:10px 22px;padding:16px 4px 2px;border-top:1px solid var(--line);margin-top:16px}
+  .legend .item{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--dim)}
+  .legend .sw{width:22px;height:0;border-top:2px solid var(--cyan)}
+  .legend .sw.dash{border-top:2px dashed rgba(53,224,212,.5)}
+  .legend .sw.block{width:11px;height:11px;border-top:0;border-radius:3px;background:var(--crimson)}
+  .legend .mono{color:var(--faint)}
+
+  /* ---- feature maps ---- */
+  .fmap{display:grid;grid-template-columns:210px 1fr;gap:0;margin-top:6px}
+  .fmap>div{display:contents}
+  .fmap dt{font-family:var(--mono);font-size:12.5px;color:var(--cyan);padding:17px 20px 17px 0;
+    border-top:1px solid var(--line);letter-spacing:.01em}
+  .fmap dd{margin:0;padding:17px 0;border-top:1px solid var(--line);color:var(--dim);font-size:13.5px;line-height:1.58}
+  .fmap dd b,.fmap dd .mono{color:var(--ink)}
+  .fmap dd .mono{font-family:var(--mono);font-size:12.5px}
+  .pill{display:inline-block;font-family:var(--mono);font-size:11px;color:#8ff3ea;border:1px solid rgba(53,224,212,.3);
+    background:rgba(53,224,212,.07);border-radius:6px;padding:1px 6px;margin:2px 4px 2px 0}
+
+  /* ---- demo vs prod ---- */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .split .panel{padding:0}
+  .split .panel-hd .tag{font-size:11px}
+  .split ul{list-style:none;margin:0;padding:16px 18px}
+  .split li{position:relative;padding:7px 0 7px 22px;font-size:13px;color:var(--dim);line-height:1.5;
+    border-bottom:1px dashed var(--line)}
+  .split li:last-child{border-bottom:0}
+  .split li::before{content:"";position:absolute;left:0;top:12px;width:8px;height:8px;border-radius:2px}
+  .split .demo li::before{background:var(--amber)}
+  .split .prod li::before{background:var(--cyan)}
+  .split li b{color:var(--ink);font-weight:600}
+  .disc{margin-top:14px;padding:16px 18px;display:flex;flex-wrap:wrap;gap:8px 20px}
+  .disc .d{font-size:12.5px;color:var(--faint);display:flex;align-items:center;gap:9px}
+  .disc .d .x{width:14px;height:14px;flex-shrink:0}
+
+  /* ---- what is real ---- */
+  .real{display:grid;grid-template-columns:1fr 1fr;gap:12px 40px}
+  .real ul{list-style:none;margin:0;padding:0}
+  .real li{display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px solid var(--line);
+    font-size:13.5px;color:var(--ink)}
+  .real li .ic{width:17px;height:17px;flex-shrink:0;margin-top:1px}
+  .real .warn li{color:var(--dim)}
+  .real h4{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--faint);margin:0 0 6px}
+
+  /* ---- cta + footer ---- */
+  .cta{display:flex;gap:12px;flex-wrap:wrap}
+  .close{padding:clamp(50px,7vw,96px) 0}
+  .close h2{font-size:clamp(26px,3.6vw,42px);letter-spacing:-.03em;max-width:20ch}
+  .close .lede{margin:16px 0 26px;max-width:56ch}
+  .foot{border-top:1px solid var(--line)}
+  .foot .in{max-width:var(--maxw);margin:0 auto;padding:26px 24px;display:flex;flex-wrap:wrap;gap:14px;
+    align-items:center;justify-content:space-between}
+  .foot .topo{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.02em}
+  .foot .lk{display:flex;gap:16px}
+  .foot .lk a{font-size:12.5px;color:var(--dim)} .foot .lk a:hover{color:var(--ink)}
+
+  @media(max-width:860px){
+    .fmap{grid-template-columns:1fr}
+    .fmap dt{padding-bottom:2px;border-top:1px solid var(--line)}
+    .fmap dd{padding-top:6px;border-top:0}
+    .split,.real{grid-template-columns:1fr}
+    .brand .tagline{display:none}
+  }
 </style>
 </head>
 <body class="grid-bg">
-<div class="stage">
-  <header class="bar">
-    <div style="display:flex;align-items:center;gap:16px">
-      <a class="wordmark" href="index.html"><span class="phi">Φ</span>PHYLAX</a>
-      <span class="eyebrow" style="border-left:1px solid var(--line);padding-left:14px">Protected match · visualized</span>
+
+<header class="top">
+  <div class="in">
+    <div class="brand">
+      <span class="wordmark"><span class="phi">Φ</span>PHYLAX</span>
+      <span class="eyebrow tagline">Architecture &amp; Security</span>
     </div>
-    <nav class="nav" style="display:flex;gap:2px"><a href="index.html">Home</a><a href="console.html">Console</a><a href="sponsor.html">Sponsor</a></nav>
-  </header>
-  <div class="canvas-wrap">
-    <canvas id="c"></canvas>
-    <div class="title"><div class="eyebrow">How the match works</div><h1>Prove the overlap.<br/>Reveal nothing else.</h1></div>
-    <div class="readout">
-      <span>GROUP <b>DDH · 2048-bit</b></span><span>ELEMENTS <b id="rEl">0</b></span>
-      <span>MATCHED <b class="m" id="rMatch">0</b></span><span>LEAKED <b class="z">0</b></span>
-    </div>
-    <div class="prog"><i id="prog"></i></div>
-    <div class="caption" id="cap"><div class="step" id="capStep"></div><div class="line" id="capLine"></div></div>
-    <div class="controls"><button class="btn" id="replay">↻ Replay</button></div>
+    <nav class="nav" aria-label="Primary">
+      <a href="index.html">Home</a>
+      <a href="console.html">Console</a>
+      <a href="architecture.html" aria-current="page">Architecture</a>
+      <a href="sponsor.html">Sponsor</a>
+    </nav>
   </div>
-</div>
-<script>
-const cv=document.getElementById('c'),ctx=cv.getContext('2d');
-const C={faint:'#3a465e',dim:'#7089a8',ink:'#e9eefb',cyan:'#35e0d4',iris:'#7c8cf8',crimson:'#ff4d6d'};
-const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const rnd=(a,b)=>a+Math.random()*(b-a), hex=n=>Array.from({length:n},()=>'0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
-const lerp=(a,b,t)=>a+(b-a)*t, clamp=(v,a,b)=>v<a?a:v>b?b:v, smooth=x=>{x=clamp(x,0,1);return x*x*(3-2*x);};
-const mixc=(c1,c2,t)=>{const p=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];const a=p(c1),b=p(c2);return`rgb(${a.map((v,i)=>Math.round(lerp(v,b[i],t))).join(',')})`;};
+</header>
 
-const PARTY=[{n:'FINTRUST'},{n:'SWIFTCART'},{n:'PINGLINE'}];
-let W=0,H=0,DPR=1,nodes=[],homes=[],mem=0,cipher={x:0,y:0},camp=[],campHex=[],CAMP_ID=hex(24);
-const NOISE=6;
-// timeline (seconds)
-const TOK0=1.1,TOK1=3.3,B0=3.3,B1=8.2,M0=8.2,M1=12.4,SEAL=13.6,END=18.5;
+<main class="wrap">
 
-function resize(){const r=cv.getBoundingClientRect();DPR=Math.min(2,devicePixelRatio||1);W=r.width;H=r.height;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);layout();}
-addEventListener('resize',resize);
-function layout(){
-  mem=W*0.44; cipher={x:W*0.73,y:H*0.52};
-  homes=[{x:W*0.14,y:H*0.30},{x:W*0.12,y:H*0.53},{x:W*0.14,y:H*0.76}];
-  const R=Math.min(W,H)*0.17;
-  camp=[0,1,2,3].map(i=>{const a=-Math.PI/2+i*Math.PI/2;return{x:cipher.x+Math.cos(a)*R,y:cipher.y+Math.sin(a)*R*0.82};});
-  for(const n of nodes){
-    const h=homes[n.party];
-    n.hx=h.x+Math.cos(n.a)*n.rr; n.hy=h.y+Math.sin(n.a)*n.rr;
-    n.sx=cipher.x-W*0.15+n.ox*36; n.sy=cipher.y+(n.hy-cipher.y)*0.34+n.oy*66;
-    if(n.campaign){n.fx=camp[n.cid].x; n.fy=camp[n.cid].y;}
-    else{n.fx=cipher.x+n.ox*W*0.17; n.fy=cipher.y+n.oy*H*0.31;}
-  }
-}
-function mk(party,campaign,cid,h){return{party,campaign,cid,hexFinal:h,a:rnd(0,6.28),rr:rnd(6,campaign?24:34),ox:rnd(-1,1),oy:rnd(-1,1),seed:Math.random()*99,settle:rnd(.15,.85),size:campaign?5:3.3};}
-function build(){nodes=[];campHex=[hex(6),hex(6),hex(6),hex(6)];for(let p=0;p<3;p++){for(let c=0;c<4;c++)nodes.push(mk(p,true,c,campHex[c]));for(let k=0;k<NOISE;k++)nodes.push(mk(p,false,-1,hex(6)));}CAMP_ID=hex(24);layout();}
+  <section class="head" style="border-top:0">
+    <span class="eyebrow">Architecture &amp; security</span>
+    <h1>How the boundary holds.</h1>
+    <p class="lede">Phylax splits the world into partner spaces and one neutral control plane, separated by a
+      trust membrane. The privacy-preserving computation happens on the partner side, in Phylax's own
+      protected-compute agents. InsForge is the neutral control plane that makes that computation a usable, auditable product. Only opaque
+      commitments, permitted aggregate findings, and hashes ever cross into the middle.</p>
+  </section>
 
-// deterministic position at time t (no stateful lerp → any single frame is correct)
-function pos(n,t,now){
-  let x,y;
-  if(t<=B0){x=n.hx;y=n.hy;}
-  else if(t<=M0){const e=smooth((t-B0)/(M0-B0));x=lerp(n.hx,n.sx,e);y=lerp(n.hy,n.sy,e);}
-  else{const e=smooth((t-M0)/(M1-M0));x=lerp(n.sx,n.fx,e);y=lerp(n.sy,n.fy,e);
-       if(n.campaign&&t>M1-0.5){x+=Math.sin(n.seed+now/1500)*2.5;y+=Math.cos(n.seed+now/1700)*2.5;}}
-  return[x,y];
-}
-const locksAt=(n,t)=>t<B0?0:t<M0?clamp(Math.floor(((t-B0)/(M0-B0)-0.05)*3.6),0,3):3;
+  <!-- ======================= DIAGRAM ======================= -->
+  <section style="border-top:0;padding-top:8px">
+    <div class="panel diagram">
+      <svg viewBox="0 0 1000 620" role="img" aria-label="Phylax architecture: three partner spaces feed opaque commitments across a trust membrane into the InsForge control plane.">
+        <defs>
+          <marker id="arw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="var(--cyan)" opacity=".7"/>
+          </marker>
+        </defs>
 
-const CAPS=[['Partner space','Three companies, three private sets of clues. Nothing has been shared yet.'],
-  ['OPRF tokenization','Each raw clue becomes an opaque token — keyed, one-way, never reversible to a customer.'],
-  ['Blinding','Every token is locked with each party’s secret key. Order doesn’t matter — like mixing paint.'],
-  ['Protected match','Identically-locked tokens converge. What’s shared resolves; everything else stays hidden.'],
-  ['Sealed','One opaque campaign, a derived score, a proof hash. 0 raw records ever crossed the membrane.']];
-const capAt=t=>t<TOK0?0:t<B0?1:t<M0?2:t<SEAL?3:4;
-let start=0,lastCap=-1,raf=null;
-function setCap(i){if(i===lastCap)return;lastCap=i;const cap=document.getElementById('cap');cap.classList.remove('show');setTimeout(()=>{document.getElementById('capStep').textContent=CAPS[i][0];document.getElementById('capLine').textContent=CAPS[i][1];cap.classList.add('show');},150);}
+        <!-- column labels -->
+        <text x="28" y="30" class="dg-mono dg-faint" font-size="11" letter-spacing="2">PARTNER SPACES</text>
+        <text x="716" y="30" class="dg-mono dg-faint" font-size="11" letter-spacing="2">NEUTRAL CONTROL PLANE</text>
 
-function render(now){
-  const t=clamp((now-start)/1000,0,END);
-  ctx.clearRect(0,0,W,H);
-  // particle field
-  for(let i=0;i<64;i++){const x=(i*137.5+now*0.006*(i%3+1))%W,y=(i*89.3+now*0.004*(i%4+1))%H;ctx.fillStyle=`rgba(120,140,180,${0.03+0.025*Math.sin(i+now/900)})`;ctx.fillRect(x,y,1.4,1.4);}
-  // cipher-space plot grid
-  ctx.strokeStyle='rgba(53,224,212,0.05)';ctx.lineWidth=1;
-  for(let gx=cipher.x-W*0.21;gx<cipher.x+W*0.22;gx+=44){ctx.beginPath();ctx.moveTo(gx,cipher.y-H*0.33);ctx.lineTo(gx,cipher.y+H*0.31);ctx.stroke();}
-  for(let gy=cipher.y-H*0.31;gy<cipher.y+H*0.32;gy+=44){ctx.beginPath();ctx.moveTo(cipher.x-W*0.21,gy);ctx.lineTo(cipher.x+W*0.22,gy);ctx.stroke();}
-  // membrane
-  const g=ctx.createLinearGradient(mem-12,0,mem+12,0);g.addColorStop(0,'rgba(53,224,212,0)');g.addColorStop(.5,'rgba(53,224,212,.5)');g.addColorStop(1,'rgba(53,224,212,0)');
-  ctx.fillStyle=g;ctx.fillRect(mem-9,H*0.10,18,H*0.80);
-  ctx.strokeStyle='rgba(53,224,212,.32)';for(let y=H*0.12;y<H*0.90;y+=20){ctx.beginPath();ctx.moveTo(mem,y);ctx.lineTo(mem,y+9);ctx.stroke();}
-  // zone labels
-  ctx.font='10px "SF Mono",ui-monospace,monospace';ctx.fillStyle='rgba(90,103,132,.85)';ctx.textAlign='left';ctx.fillText('PARTNER SPACE',W*0.055,H-14);
-  ctx.textAlign='center';ctx.fillText('MEMBRANE',mem,H-14);ctx.fillText('CIPHER SPACE · NEUTRAL PLANE',cipher.x,H-14);
-  // party labels (fade as they leave)
-  const plf=Math.max(0,1-Math.max(0,(t-B0))/1.5);
-  if(plf>0){ctx.textAlign='center';ctx.fillStyle=`rgba(90,103,132,${.9*plf})`;homes.forEach((h,i)=>ctx.fillText(PARTY[i].n,h.x,h.y-42));}
-  // constellation edges
-  if(t>M0+2){const e=smooth((t-(M0+2))/1.2);ctx.strokeStyle=`rgba(255,77,109,${0.5*e})`;ctx.lineWidth=1.1;ctx.setLineDash([3,5]);ctx.lineDashOffset=-now/60;for(let i=0;i<4;i++)for(let j=i+1;j<4;j++){ctx.beginPath();ctx.moveTo(camp[i].x,camp[i].y);ctx.lineTo(camp[j].x,camp[j].y);ctx.stroke();}ctx.setLineDash([]);}
-  // bloom at match
-  const bl=(t-M0)/0.9;if(bl>0&&bl<1){const rr=bl*Math.min(W,H)*0.4,gg=ctx.createRadialGradient(cipher.x,cipher.y,0,cipher.x,cipher.y,rr);gg.addColorStop(0,`rgba(255,77,109,${0.32*(1-bl)})`);gg.addColorStop(1,'rgba(255,77,109,0)');ctx.fillStyle=gg;ctx.beginPath();ctx.arc(cipher.x,cipher.y,rr,0,7);ctx.fill();}
+        <!-- ===== three partner cards ===== -->
+        <!-- FinTrust -->
+        <g>
+          <rect x="28" y="46" width="250" height="150" rx="12" class="dg-card"/>
+          <text x="46" y="76" class="dg-sans dg-t" font-size="14" font-weight="600">FinTrust Bank</text>
+          <text x="46" y="94" class="dg-mono dg-faint" font-size="10">org · bank · own project</text>
+          <rect x="46" y="106" width="214" height="30" rx="7" class="dg-row"/>
+          <text x="58" y="125" class="dg-mono dg-sub" font-size="11">local data · RLS · vectors (opt)</text>
+          <rect x="46" y="144" width="214" height="30" rx="7" class="dg-row"/>
+          <text x="58" y="163" class="dg-mono dg-cy" font-size="11">party compute agent · DDH-PSI</text>
+        </g>
+        <!-- SwiftCart -->
+        <g>
+          <rect x="28" y="235" width="250" height="150" rx="12" class="dg-card"/>
+          <text x="46" y="265" class="dg-sans dg-t" font-size="14" font-weight="600">SwiftCart Marketplace</text>
+          <text x="46" y="283" class="dg-mono dg-faint" font-size="10">org · marketplace · own project</text>
+          <rect x="46" y="295" width="214" height="30" rx="7" class="dg-row"/>
+          <text x="58" y="314" class="dg-mono dg-sub" font-size="11">local data · RLS · vectors (opt)</text>
+          <rect x="46" y="333" width="214" height="30" rx="7" class="dg-row"/>
+          <text x="58" y="352" class="dg-mono dg-cy" font-size="11">party compute agent · DDH-PSI</text>
+        </g>
+        <!-- PingLine -->
+        <g>
+          <rect x="28" y="424" width="250" height="150" rx="12" class="dg-card"/>
+          <text x="46" y="454" class="dg-sans dg-t" font-size="14" font-weight="600">PingLine Messaging</text>
+          <text x="46" y="472" class="dg-mono dg-faint" font-size="10">org · messaging · own project</text>
+          <rect x="46" y="484" width="214" height="30" rx="7" class="dg-row"/>
+          <text x="58" y="503" class="dg-mono dg-sub" font-size="11">local data · RLS · vectors (opt)</text>
+          <rect x="46" y="522" width="214" height="30" rx="7" class="dg-row"/>
+          <text x="58" y="541" class="dg-mono dg-cy" font-size="11">party compute agent · DDH-PSI</text>
+        </g>
 
-  let matched=0;
-  for(const n of nodes){
-    const[x,y]=pos(n,t,now), lk=locksAt(n,t);
-    const noiseFade=(!n.campaign&&t>M0+0.7)?smooth((t-(M0+0.7))/1.4):0;
-    const alpha=n.campaign?1:lerp(1,0.07,noiseFade);
-    let col=t<TOK0?'#9fb0cc':(!n.campaign&&t>M0+0.7?C.faint:(t<M0?mixc(C.cyan,C.iris,lk/3):(n.campaign?C.crimson:C.faint)));
-    if(n.campaign&&t>M0)matched=4;
-    for(let i=0;i<lk;i++){const rr=n.size+5+i*4.2,rot=now/700*(i%2?-1:1)*(i+1)*0.5+n.seed;ctx.strokeStyle=`rgba(${n.campaign&&t>M0?'255,77,109':'124,140,248'},${0.45*alpha})`;ctx.lineWidth=1;ctx.beginPath();ctx.arc(x,y,rr,rot,rot+Math.PI*1.35);ctx.stroke();}
-    ctx.save();ctx.globalAlpha=alpha;ctx.shadowColor=col;ctx.shadowBlur=(n.campaign?15:7)*alpha;ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,y,n.size,0,7);ctx.fill();ctx.restore();
-  }
-  // 4 clean labels at the constellation points
-  if(t>M0+0.9){const la=smooth((t-(M0+0.9))/0.9);ctx.globalAlpha=la;ctx.fillStyle='rgba(255,179,193,.92)';ctx.font='10px "SF Mono",ui-monospace,monospace';for(let i=0;i<4;i++){const right=camp[i].x>=cipher.x;ctx.textAlign=right?'left':'right';ctx.fillText('0x'+campHex[i],camp[i].x+(right?11:-11),camp[i].y+3);}ctx.globalAlpha=1;}
-  // sealed campaign
-  if(t>=SEAL){const s=smooth((t-SEAL)/1.2);ctx.save();ctx.shadowColor=C.crimson;ctx.shadowBlur=24*s;ctx.strokeStyle=`rgba(255,77,109,${s})`;ctx.lineWidth=1.6;ctx.beginPath();ctx.arc(cipher.x,cipher.y,Math.min(W,H)*0.205,0,7);ctx.stroke();ctx.restore();ctx.fillStyle=`rgba(255,179,193,${s})`;ctx.font='600 12px "SF Mono",ui-monospace,monospace';ctx.textAlign='center';ctx.fillText('CAMPAIGN '+CAMP_ID.slice(0,12)+'…',cipher.x,cipher.y+Math.min(W,H)*0.205+22);}
+        <!-- ===== trust membrane ===== -->
+        <line x1="430" y1="34" x2="430" y2="586" class="dg-mem" stroke-width="1.4" stroke-dasharray="6 7"/>
+        <text x="430" y="24" text-anchor="middle" class="dg-mono dg-cy" font-size="10" letter-spacing="3">TRUST MEMBRANE</text>
+        <!-- sealed zero -->
+        <circle cx="430" cy="310" r="38" fill="rgba(53,224,212,.08)" class="dg-mem" stroke-width="1.3"/>
+        <circle cx="430" cy="310" r="27" fill="none" stroke="rgba(53,224,212,.18)" stroke-width="1"/>
+        <text x="430" y="322" text-anchor="middle" class="dg-mono dg-cy" font-size="30" font-weight="600">0</text>
+        <text x="430" y="366" text-anchor="middle" class="dg-mono dg-faint" font-size="9.5" letter-spacing="1">RAW RECORDS</text>
 
-  document.getElementById('rEl').textContent=t<TOK1?Math.floor((t/TOK1)*nodes.length):nodes.length;
-  document.getElementById('rMatch').textContent=matched;
-  document.getElementById('prog').style.width=Math.min(100,(t/END)*100)+'%';
-  setCap(capAt(t));
-}
-function loop(now){render(now);raf=requestAnimationFrame(loop);}
-function run(){if(raf)cancelAnimationFrame(raf);build();start=reduce?performance.now()-END*1000:performance.now();raf=requestAnimationFrame(loop);}
-document.getElementById('replay').onclick=run;
-window.__seek=s=>{start=performance.now()-s*1000;render(performance.now());};
-window.__dbg=()=>{const t=clamp((performance.now()-start)/1000,0,END);return{t:+t.toFixed(1),W:Math.round(W),n:nodes.slice(0,4).map(n=>{const[x]=pos(n,t,0);return{c:n.campaign,cid:n.cid,x:Math.round(x),fx:Math.round(n.fx)};})};};
-resize();run();
-</script>
+        <!-- ===== flows: partner -> membrane -> control ===== -->
+        <path d="M278 131 C 350 131, 360 300, 392 305" class="dg-flow" stroke-width="1.4"/>
+        <path d="M278 310 H 388" class="dg-flow" stroke-width="1.4"/>
+        <path d="M278 489 C 350 489, 360 320, 392 315" class="dg-flow" stroke-width="1.4"/>
+        <!-- bundle crossing to control -->
+        <path d="M468 310 H 686" class="dg-flow" stroke-width="1.8" marker-end="url(#arw)"/>
+        <text x="577" y="300" text-anchor="middle" class="dg-mono dg-cy" font-size="10.5">opaque commitments</text>
+        <text x="577" y="328" text-anchor="middle" class="dg-mono dg-faint" font-size="10">aggregate findings · hashes</text>
+
+        <!-- ===== control plane (InsForge) ===== -->
+        <rect x="692" y="80" width="280" height="472" rx="14" class="dg-ctrl"/>
+        <rect x="692" y="80" width="280" height="46" rx="14" class="dg-ctrlhd"/>
+        <text x="712" y="102" class="dg-sans dg-t" font-size="13.5" font-weight="600">Phylax Control</text>
+        <text x="712" y="118" class="dg-mono dg-cy" font-size="10">InsForge · kd6vibk3 · is_control</text>
+
+        <g class="dg-mono" font-size="11.5">
+          <rect x="710" y="142" width="244" height="64" rx="9" class="dg-ctrlrow"/>
+          <text x="724" y="166" class="dg-t">Auth + RLS</text>
+          <text x="724" y="185" class="dg-sub" font-size="10.5">6 roles · tenant isolation</text>
+
+          <rect x="710" y="216" width="244" height="64" rx="9" class="dg-ctrlrow"/>
+          <text x="724" y="240" class="dg-t">Postgres</text>
+          <text x="724" y="259" class="dg-sub" font-size="10.5">13 tables · state machine · audit</text>
+
+          <rect x="710" y="290" width="244" height="64" rx="9" class="dg-ctrlrow"/>
+          <text x="724" y="314" class="dg-t">Edge Functions</text>
+          <text x="724" y="333" class="dg-sub" font-size="10.5">8 fns · HMAC + replay guard</text>
+
+          <rect x="710" y="364" width="244" height="64" rx="9" class="dg-ctrlrow"/>
+          <text x="724" y="388" class="dg-t">Realtime</text>
+          <text x="724" y="407" class="dg-sub" font-size="10.5">run: / org: · safe metadata</text>
+
+          <rect x="710" y="438" width="244" height="64" rx="9" class="dg-ctrlrow"/>
+          <text x="724" y="462" class="dg-t">Storage</text>
+          <text x="724" y="481" class="dg-sub" font-size="10.5">private phylax-artifacts bucket</text>
+        </g>
+
+        <!-- never-crosses barrier note on membrane -->
+        <text x="430" y="410" text-anchor="middle" class="dg-mono dg-crim" font-size="9.5" letter-spacing="1">✕ NEVER CROSSES</text>
+        <text x="430" y="428" text-anchor="middle" class="dg-mono dg-faint" font-size="9">raw · identities · vectors</text>
+        <text x="430" y="441" text-anchor="middle" class="dg-mono dg-faint" font-size="9">watchlists · account numbers</text>
+      </svg>
+
+      <div class="legend">
+        <span class="item"><span class="sw"></span> crosses the membrane <span class="mono">commitments · aggregates · hashes</span></span>
+        <span class="item"><span class="sw dash"></span> trust membrane <span class="mono">party ⟷ neutral boundary</span></span>
+        <span class="item"><span class="sw block"></span> never centralized <span class="mono">raw · identities · vectors</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= INSFORGE FEATURE MAP ======================= -->
+  <section>
+    <div class="sec-hd">
+      <span class="eyebrow">InsForge feature map</span>
+      <h2>The neutral control plane, feature by feature.</h2>
+      <p class="lede">InsForge is not a database Phylax happens to use — it <em>is</em> the trust boundary,
+        the auditable ledger, the live incident stream, and the deploy target. Every capability maps to a
+        concrete containment need.</p>
+    </div>
+
+    <dl class="fmap">
+      <dt>Auth + RLS</dt>
+      <dd><b>6 roles</b> — <span class="mono">platform_admin · partner_admin · analyst · operator · approver · auditor</span>.
+        Authenticated members get scoped, read-only access; every write flows through an edge function under the
+        admin key, authorized from membership (never a client-supplied org id). Tenant isolation is asserted by
+        test: a FinTrust user cannot read SwiftCart's private signal batches or commitments.</dd>
+
+      <dt>Postgres</dt>
+      <dd><b>13 tables</b> behind a monotonic, server-enforced state machine —
+        <span class="mono">draft → awaiting_parties → running → protected_match → risk_scored → awaiting_approval → actioned → receipted</span>.
+        An illegal transition is rejected for <em>every</em> role, including admin. The audit ledger and the
+        finding tables are append-only by trigger, and <span class="mono">raw_records_shared = 0</span> is a hard
+        DB invariant.</dd>
+
+      <dt>Edge Functions</dt>
+      <dd><b>8 functions</b> —
+        <span class="pill">submit-signal-manifest</span><span class="pill">create-detection-run</span><span class="pill">dispatch-party-run</span><span class="pill">receive-worker-callback</span><span class="pill">request-action</span><span class="pill">approve-action</span><span class="pill">issue-receipt</span><span class="pill">verify-receipt</span>.
+        Worker callbacks are authenticated with HMAC-SHA256 over the exact signed envelope, a timestamp
+        freshness window, and a single-use nonce ledger for hard replay protection.</dd>
+
+      <dt>Realtime</dt>
+      <dd>Live progress on <span class="mono">run:{id}</span> and <span class="mono">org:{id}</span> channels,
+        carrying <b>safe metadata only</b> — phase, derived score, cardinality, and the always-zero raw counter,
+        never a signal or identifier. Channel-subscription RLS ensures only authorized viewers can subscribe.</dd>
+
+      <dt>Storage</dt>
+      <dd>A private <span class="mono">phylax-artifacts</span> bucket holds input packages, model artifacts,
+        signed run reports, and receipts. The database keeps only bucket/key pointers plus checksums — never the
+        raw evidence itself.</dd>
+
+      <dt>Custom Compute</dt>
+      <dd>Dockerized <b>party compute services</b> (Linux · Python&nbsp;3.10) run the long-lived
+        protected-compute agents beside each org's data, executing that party's share of the PSI and secure
+        aggregation.</dd>
+
+      <dt>Backend Branching</dt>
+      <dd>A <b>schema-only security branch</b> validates RLS and state-machine changes in isolation before they
+        are applied to the production control plane.</dd>
+
+      <dt>Sites</dt>
+      <dd>The operator console and this site deploy on <b>InsForge Sites</b>, served from the same project that
+        governs the data — one control plane, front to back.</dd>
+    </dl>
+  </section>
+
+  <!-- ======================= PRIVACY-PRESERVING COMPUTATION ======================= -->
+  <section>
+    <div class="sec-hd">
+      <span class="eyebrow">Privacy-preserving computation</span>
+      <h2>The privacy-preserving computation, on the party side.</h2>
+      <p class="lede">The cryptography runs on the party side; it never touches the neutral plane. What leaves a
+        party is only what the protocol is designed to output.</p>
+    </div>
+
+    <dl class="fmap">
+      <dt>DDH PSI</dt>
+      <dd><b>Private set intersection</b> across three parties via multiparty commutative encryption in a
+        DDH-hard group — <span class="mono">2048-bit MODP</span> locally, a <span class="mono">1024-bit MODP</span>
+        group on the hosted edge. The coordinator relays fully-blinded group
+        elements and learns only the intersection; non-matching tokens are never revealed.</dd>
+
+      <dt>Secure aggregation</dt>
+      <dd><b>Additive secret sharing</b> over a Mersenne-prime field computes consortium sums, means, and
+        moments for the permitted aggregate features. No party — and not the coordinator — ever sees another
+        party's individual value; only the aggregate leaves the protocol.</dd>
+
+      <dt>Federated risk model</dt>
+      <dd>A <b>real numeric model</b> — <span class="mono">phylax-risk 1.0.0</span>, logistic regression over
+        five features (<span class="mono">distinct_parties, matched_signatures, total_events, mean_velocity_z,
+        temporal_alignment</span>) — scores the matched cluster from those aggregates alone.</dd>
+
+      <dt>Runs anywhere</dt>
+      <dd>The implementation is pure standard library — no native wheels — so the protected computation
+        reproduces on any machine and even runs inside the InsForge edge function itself, yielding identical
+        results in every backend.</dd>
+    </dl>
+  </section>
+
+  <!-- ======================= DEMO VS PRODUCTION ======================= -->
+  <section>
+    <div class="sec-hd">
+      <span class="eyebrow">Trust boundary · demo vs production</span>
+      <h2>Exactly where the demonstration ends.</h2>
+      <p class="lede">The protocol and the product are real and running. The infrastructure isolation is
+        modeled, not proven — and saying so plainly is part of the security posture.</p>
+    </div>
+
+    <div class="split">
+      <div class="panel">
+        <div class="panel-hd"><span class="eyebrow">Demo · today</span><span class="tag am">functional demonstration</span></div>
+        <ul class="demo">
+          <li><b>Synthetic data</b> generated from a fixed seed — no real customers, messages, or accounts.</li>
+          <li>All three parties plus control run in a <b>single InsForge account</b> (one topology).</li>
+          <li>Proves the <b>protocol, the state machine, and the product</b> end to end.</li>
+          <li><b>Not</b> proof of adversarial infrastructure isolation — the parties are not mutually distrusting hosts here.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <div class="panel-hd"><span class="eyebrow">Production · design</span><span class="tag cy">independent parties</span></div>
+        <ul class="prod">
+          <li>Each org runs its <b>own InsForge project</b>, its own party service, and <b>independent key material</b>.</li>
+          <li>The OPRF key is <b>jointly governed / threshold</b> — no single party can tokenize alone.</li>
+          <li><b>Per-org Ed25519 signing</b>; private keys never enter the control plane.</li>
+          <li>The neutral plane still centralizes <b>zero raw records</b> — the invariant does not change.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel disc">
+      <span class="d"><svg class="x" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="var(--faint)" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Not described as "encrypted end-to-end" — it is PSI + MPC, not E2EE</span>
+      <span class="d"><svg class="x" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="var(--faint)" stroke-width="1.5" stroke-linecap="round"/></svg>
+        No legal or compliance certification is claimed</span>
+      <span class="d"><svg class="x" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="var(--faint)" stroke-width="1.5" stroke-linecap="round"/></svg>
+        No automatic accusations — every action needs a human at the target org</span>
+    </div>
+  </section>
+
+  <!-- ======================= WHAT IS REAL ======================= -->
+  <section>
+    <div class="sec-hd">
+      <span class="eyebrow">What is real</span>
+      <h2>The checklist, without the hand-waving.</h2>
+    </div>
+    <div class="real">
+      <div>
+        <h4>Running now</h4>
+        <ul>
+          <li><svg class="ic" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--cyan)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            2048-bit MODP DDH-PSI locally; a 1024-bit MODP group inside the InsForge edge function</li>
+          <li><svg class="ic" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--cyan)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Trained logistic-regression risk model — not an LLM, not a random score</li>
+          <li><svg class="ic" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--cyan)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Server-enforced monotonic state machine + append-only audit ledger</li>
+          <li><svg class="ic" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--cyan)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            RLS tenant isolation across partner-private tables</li>
+          <li><svg class="ic" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--cyan)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="mono">raw_records_shared = 0</span> as a hard DB invariant; HMAC + nonce replay guard on callbacks</li>
+        </ul>
+      </div>
+      <div class="warn">
+        <h4>Honestly still staged</h4>
+        <ul>
+          <li><svg class="ic" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="var(--amber)" stroke-width="1.5"/><path d="M8 5v4M8 11h.01" stroke="var(--amber)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Single-account demo topology — not isolated, mutually-distrusting infrastructure</li>
+          <li><svg class="ic" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="var(--amber)" stroke-width="1.5"/><path d="M8 5v4M8 11h.01" stroke="var(--amber)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Synthetic data only — no real customer signals</li>
+          <li><svg class="ic" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="var(--amber)" stroke-width="1.5"/><path d="M8 5v4M8 11h.01" stroke="var(--amber)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            No third-party security audit or compliance certification</li>
+          <li><svg class="ic" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="var(--amber)" stroke-width="1.5"/><path d="M8 5v4M8 11h.01" stroke="var(--amber)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Threshold OPRF-key governance is designed, not yet deployed</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="close">
+    <span class="eyebrow">Next</span>
+    <h2>See the boundary in motion.</h2>
+    <p class="lede">The console runs the full pipeline live against the InsForge control plane; the sponsor page
+      details why every layer is InsForge-native.</p>
+    <div class="cta">
+      <a class="btn btn-primary btn-lg" href="console.html">Open the console</a>
+      <a class="btn btn-lg" href="sponsor.html">Why InsForge</a>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="in">
+    <span class="topo">synthetic / demo topology · real PSI + MPC · live InsForge control plane</span>
+    <span class="lk">
+      <a href="index.html">Home</a>
+      <a href="console.html">Console</a>
+      <a href="sponsor.html">Sponsor</a>
+    </span>
+  </div>
+</footer>
+
 </body>
 </html>
