@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Phylax · Architecture &amp; Security</title>
+<meta name="description" content="How Phylax keeps the boundary: InsForge as the neutral control plane, SecretFlow for the privacy-preserving computation, and only opaque commitments crossing the trust membrane."/>
+<link rel="stylesheet" href="/assets/phylax.css"/>
+<style>
+  :root{ --maxw:1180px }
+  a:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:6px}
+
+  /* ---- shared shell ---- */
+  .top{position:sticky;top:0;z-index:30;backdrop-filter:blur(12px);
+    background:linear-gradient(180deg,rgba(5,7,14,.9),rgba(5,7,14,.55));border-bottom:1px solid var(--line)}
+  .top .in{max-width:var(--maxw);margin:0 auto;display:flex;align-items:center;justify-content:space-between;
+    gap:14px;padding:13px 24px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:16px;min-width:0}
+  .brand .tagline{border-left:1px solid var(--line);padding-left:16px}
+  .nav{display:flex;gap:2px;flex-wrap:wrap}
+  .nav a{font-size:13px;color:var(--dim);padding:7px 11px;border-radius:8px;transition:.15s}
+  .nav a:hover{color:var(--ink);background:rgba(20,29,49,.6)}
+  .nav a[aria-current="page"]{color:var(--ink);background:rgba(20,29,49,.72)}
+  .wrap{position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  section{padding:clamp(46px,7vw,88px) 0;border-top:1px solid var(--line)}
+  section:first-of-type{border-top:0}
+  .sec-hd{max-width:760px;margin-bottom:30px}
+  .sec-hd h2{font-size:clamp(24px,3.2vw,38px);margin-top:12px}
+  .sec-hd .lede{margin-top:14px}
+
+  .head{padding:clamp(44px,6vw,80px) 0 8px}
+  .head h1{font-size:clamp(34px,5.2vw,64px);font-weight:700;letter-spacing:-0.04em;line-height:1}
+  .head .lede{margin-top:20px;max-width:64ch}
+
+  /* ---- diagram ---- */
+  .diagram{padding:20px}
+  .diagram svg{width:100%;height:auto;display:block}
+  .dg-card{fill:rgba(12,18,32,.6);stroke:var(--line)}
+  .dg-row{fill:rgba(20,29,49,.5);stroke:var(--line)}
+  .dg-ctrl{fill:rgba(9,14,26,.8);stroke:rgba(53,224,212,.32)}
+  .dg-ctrlhd{fill:rgba(53,224,212,.06);stroke:rgba(53,224,212,.3)}
+  .dg-ctrlrow{fill:rgba(20,29,49,.55);stroke:var(--line)}
+  .dg-t{fill:var(--ink)} .dg-sub{fill:var(--dim)} .dg-faint{fill:var(--faint)}
+  .dg-cy{fill:var(--cyan)} .dg-crim{fill:var(--crimson)}
+  .dg-mono{font-family:var(--mono)} .dg-sans{font-family:var(--sans)}
+  .dg-flow{stroke:var(--cyan);opacity:.5;fill:none} .dg-mem{stroke:rgba(53,224,212,.4)}
+  .legend{display:flex;flex-wrap:wrap;gap:10px 22px;padding:16px 4px 2px;border-top:1px solid var(--line);margin-top:16px}
+  .legend .item{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--dim)}
+  .legend .sw{width:22px;height:0;border-top:2px solid var(--cyan)}
+  .legend .sw.dash{border-top:2px dashed rgba(53,224,212,.5)}
+  .legend .sw.block{width:11px;height:11px;border-top:0;border-radius:3px;background:var(--crimson)}
+  .legend .mono{color:var(--faint)}
+
+  /* ---- feature maps ---- */
+  .fmap{display:grid;grid-template-columns:210px 1fr;gap:0;margin-top:6px}
+  .fmap>div{display:contents}
+  .fmap dt{font-family:var(--mono);font-size:12.5px;color:var(--cyan);padding:17px 20px 17px 0;
+    border-top:1px solid var(--line);letter-spacing:.01em}
+  .fmap dd{margin:0;padding:17px 0;border-top:1px solid var(--line);color:var(--dim);font-size:13.5px;line-height:1.58}
+  .fmap dd b,.fmap dd .mono{color:var(--ink)}
+  .fmap dd .mono{font-family:var(--mono);font-size:12.5px}
+  .pill{display:inline-block;font-family:var(--mono);font-size:11px;color:#8ff3ea;border:1px solid rgba(53,224,212,.3);
+    background:rgba(53,224,212,.07);border-radius:6px;padding:1px 6px;margin:2px 4px 2px 0}
+
+  /* ---- demo vs prod ---- */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .split .panel{padding:0}
+  .split .panel-hd .tag{font-size:11px}
+  .split ul{list-style:none;margin:0;padding:16px 18px}
+  .split li{position:relative;padding:7px 0 7px 22px;font-size:13px;color:var(--dim);line-height:1.5;
+    border-bottom:1px dashed var(--line)}
+  .split li:last-child{border-bottom:0}
+  .split li::before{content:"";position:absolute;left:0;top:12px;width:8px;height:8px;border-radius:2px}
+  .split .demo li::before{background:var(--amber)}
+  .split .prod li::before{background:var(--cyan)}
+  .split li b{color:var(--ink);font-weight:600}
+  .disc{margin-top:14px;padding:16px 18px;display:flex;flex-wrap:wrap;gap:8px 20px}
+  .disc .d{font-size:12.5px;color:var(--faint);display:flex;align-items:center;gap:9px}
+  .disc .d .x{width:14px;height:14px;flex-shrink:0}
+
+  /* ---- what is real ---- */
+  .real{display:grid;grid-template-columns:1fr 1fr;gap:12px 40px}
+  .real ul{list-style:none;margin:0;padding:0}
+  .real li{display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px solid var(--line);
+    font-size:13.5px;color:var(--ink)}
+  .real li .ic{width:17px;height:17px;flex-shrink:0;margin-top:1px}
+  .real .warn li{color:var(--dim)}
+  .real h4{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--faint);margin:0 0 6px}
+
+  /* ---- cta + footer ---- */
+  .cta{display:flex;gap:12px;flex-wrap:wrap}
+  .close{padding:clamp(50px,7vw,96px) 0}
+  .close h2{font-size:clamp(26px,3.6vw,42px);letter-spacing:-.03em;max-width:20ch}
+  .close .lede{margin:16px 0 26px;max-width:56ch}
+  .foot{border-top:1px solid var(--line)}
+  .foot .in{max-width:var(--maxw);margin:0 auto;padding:26px 24px;display:flex;flex-wrap:wrap;gap:14px;
+    align-items:center;justify-content:space-between}
+  .foot .topo{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.02em}
+  .foot .lk{display:flex;gap:16px}
+  .foot .lk a{font-size:12.5px;color:var(--dim)} .foot .lk a:hover{color:var(--ink)}
+
+  @media(max-width:860px){
+    .fmap{grid-template-columns:1fr}
+    .fmap dt{padding-bottom:2px;border-top:1px solid var(--line)}
+    .fmap dd{padding-top:6px;border-top:0}
+    .split,.real{grid-template-columns:1fr}
+    .brand .tagline{display:none}
+  }
+</style>
+</head>
+<body class="grid-bg">
+
+<header class="top">
+  <div class="in">
+    <div class="brand">
+      <span class="wordmark"><span class="phi">Φ</span>YLAX</span>
+      <span class="eyebrow tagline">Architecture &amp; Security</span>
+    </div>
+    <nav class="nav" aria-label="Primary">
+      <a href="/">Home</a>
+      <a href="/console">Console</a>
+      <a href="/architecture" aria-current="page">Architecture</a>
+      <a href="/sponsor">Sponsor</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="head" style="border-top:0">
+    <span class="eyebrow">Architecture &amp; security</span>
+    <h1>How the boundary holds.</h1>
+    <p class="lede">Phylax splits the world into partner spaces and one neutral control plane, separated by a
+      trust membrane. The privacy-preserving computation happens on the partner side, in SecretFlow. InsForge
+      is the neutral control plane that makes that computation a usable, auditable product. Only opaque
+      commitments, permitted aggregate findings, and hashes ever cross into the middle.</p>
+  </section>
+
+  <!-- ======================= DIAGRAM ======================= -->
+  <section style="border-top:0;padding-top:8px">
+    <div class="panel diagram">
+      <svg viewBox="0 0 1000 620" role="img" aria-label="Phylax architecture: three partner spaces feed opaque commitments across a trust membrane into the InsForge control plane.">
+        <defs>
+          <marker id="arw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="var(--cyan)" opacity=".7"/>
+          </marker>
+        </defs>
+
+        <!-- column labels -->
+        <text x="28" y="30" class="dg-mono dg-faint" font-size="11" letter-spacing="2">PARTNER SPACES</text>
+        <text x="716" y="30" class="dg-mono dg-faint" font-size="11" letter-spacing="2">NEUTRAL CONTROL PLANE</text>
+
+        <!-- ===== three partner cards ===== -->
+        <!-- FinTrust -->
+        <g>
+          <rect x="28" y="46" width="250" height="150" rx="12" class="dg-card"/>
+          <text x="46" y="76" class="dg-sans dg-t" font-size="14" font-weight="600">FinTrust Bank</text>
+          <text x="46" y="94" class="dg-mono dg-faint" font-size="10">org · bank · own project</text>
+          <rect x="46" y="106" width="214" height="30" rx="7" class="dg-row"/>
+          <text x="58" y="125" class="dg-mono dg-sub" font-size="11">local data · RLS · vectors (opt)</text>
+          <rect x="46" y="144" width="214" height="30" rx="7" class="dg-row"/>
+          <text x="58" y="163" class="dg-mono dg-cy" font-size="11">party compute agent · SecretFlow</text>
+        </g>
+        <!-- SwiftCart -->
+        <g>
+          <rect x="28" y="235" width="250" height="150" rx="12" class="dg-card"/>
+          <text x="46" y="265" class="dg-sans dg-t" font-size="14" font-weight="600">SwiftCart Marketplace</text>
+          <text x="46" y="283" class="dg-mono dg-faint" font-size="10">org · marketplace · own project</text>
+          <rect x="46" y="295" width="214" height="30" rx="7" class="dg-row"/>
+          <text x="58" y="314" class="dg-mono dg-sub" font-size="11">local data · RLS · vectors (opt)</text>
+          <rect x="46" y="333" width="214" height="30" rx="7" class="dg-row"/>
+          <text x="58" y="352" class="dg-mono dg-cy" font-size="11">party compute agent · SecretFlow</text>
+        </g>
+        <!-- PingLine -->
+        <g>
+          <rect x="28" y="424" width="250" height="150" rx="12" class="dg-card"/>
+          <text x="46" y="454" class="dg-sans dg-t" font-size="14" font-weight="600">PingLine Messaging</text>
+          <text x="46" y="472" class="dg-mono dg-faint" font-size="10">org · messaging · own project</text>
+          <rect x="46" y="484" width="214" height="30" rx="7" class="dg-row"/>
+          <text x="58" y="503" class="dg-mono dg-sub" font-size="11">local data · RLS · vectors (opt)</text>
+          <rect x="46" y="522" width="214" height="30" rx="7" class="dg-row"/>
+          <text x="58" y="541" class="dg-mono dg-cy" font-size="11">party compute agent · SecretFlow</text>
+        </g>
+
+        <!-- ===== trust membrane ===== -->
+        <line x1="430" y1="34" x2="430" y2="586" class="dg-mem" stroke-width="1.4" stroke-dasharray="6 7"/>
+        <text x="430" y="24" text-anchor="middle" class="dg-mono dg-cy" font-size="10" letter-spacing="3">TRUST MEMBRANE</text>
+        <!-- sealed zero -->
+        <circle cx="430" cy="310" r="38" fill="rgba(53,224,212,.08)" class="dg-mem" stroke-width="1.3"/>
+        <circle cx="430" cy="310" r="27" fill="none" stroke="rgba(53,224,212,.18)" stroke-width="1"/>
+        <text x="430" y="322" text-anchor="middle" class="dg-mono dg-cy" font-size="30" font-weight="600">0</text>
+        <text x="430" y="366" text-anchor="middle" class="dg-mono dg-faint" font-size="9.5" letter-spacing="1">RAW RECORDS</text>
+
+        <!-- ===== flows: partner -> membrane -> control ===== -->
+        <path d="M278 131 C 350 131, 360 300, 392 305" class="dg-flow" stroke-width="1.4"/>
+        <path d="M278 310 H 388" class="dg-flow" stroke-width="1.4"/>
+        <path d="M278 489 C 350 489, 360 320, 392 315" class="dg-flow" stroke-width="1.4"/>
+        <!-- bundle crossing to control -->
+        <path d="M468 310 H 686" class="dg-flow" stroke-width="1.8" marker-end="url(#arw)"/>
+        <text x="577" y="300" text-anchor="middle" class="dg-mono dg-cy" font-size="10.5">opaque commitments</text>
+        <text x="577" y="328" text-anchor="middle" class="dg-mono dg-faint" font-size="10">aggregate findings · hashes</text>
+
+        <!-- ===== control plane (InsForge) ===== -->
+        <rect x="692" y="80" width="280" height="472" rx="14" class="dg-ctrl"/>
+        <rect x="692" y="80" width="280" height="46" rx="14" class="dg-ctrlhd"/>
+        <text x="712" y="102" class="dg-sans dg-t" font-size="13.5" font-weight="600">Phylax Control</text>
+        <text x="712" y="118" class="dg-mono dg-cy" font-size="10">InsForge · kd6vibk3 · is_control</text>
+
+        <g class="dg-mono" font-size="11.5">
+          <rect x="710" y="142" width="244" height="64" rx="9" class="dg-ctrlrow"/>
+          <text x="724" y="166" class="dg-t">Auth + RLS</text>
+          <text x="724" y="185" class="dg-sub" font-size="10.5">6 roles · tenant isolation</text>
+
+          <rect x="710" y="216" width="244" height="64" rx="9" class="dg-ctrlrow"/>
+          <text x="724" y="240" class="dg-t">Postgres</text>
+          <text x="724" y="259" class="dg-sub" font-size="10.5">13 tables · state machine · audit</text>
+
+          <rect x="710" y="290" width="244" height="64" rx="9" class="dg-ctrlrow"/>
+          <text x="724" y="314" class="dg-t">Edge Functions</text>
+          <text x="724" y="333" class="dg-sub" font-size="10.5">8 fns · HMAC + replay guard</text>
+
+          <rect x="710" y="364" width="244" height="64" rx="9" class="dg-ctrlrow"/>
+          <text x="724" y="388" class="dg-t">Realtime</text>
+          <text x="724" y="407" class="dg-sub" font-size="10.5">run: / org: · safe metadata</text>
+
+          <rect x="710" y="438" width="244" height="64" rx="9" class="dg-ctrlrow"/>
+          <text x="724" y="462" class="dg-t">Storage</text>
+          <text x="724" y="481" class="dg-sub" font-size="10.5">private phylax-artifacts bucket</text>
+        </g>
+
+        <!-- never-crosses barrier note on membrane -->
+        <text x="430" y="410" text-anchor="middle" class="dg-mono dg-crim" font-size="9.5" letter-spacing="1">✕ NEVER CROSSES</text>
+        <text x="430" y="428" text-anchor="middle" class="dg-mono dg-faint" font-size="9">raw · identities · vectors</text>
+        <text x="430" y="441" text-anchor="middle" class="dg-mono dg-faint" font-size="9">watchlists · account numbers</text>
+      </svg>
+
+      <div class="legend">
+        <span class="item"><span class="sw"></span> crosses the membrane <span class="mono">commitments · aggregates · hashes</span></span>
+        <span class="item"><span class="sw dash"></span> trust membrane <span class="mono">party ⟷ neutral boundary</span></span>
+        <span class="item"><span class="sw block"></span> never centralized <span class="mono">raw · identities · vectors</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= INSFORGE FEATURE MAP ======================= -->
+  <section>
+    <div class="sec-hd">
+      <span class="eyebrow">InsForge feature map</span>
+      <h2>The neutral control plane, feature by feature.</h2>
+      <p class="lede">InsForge is not a database Phylax happens to use — it <em>is</em> the trust boundary,
+        the auditable ledger, the live incident stream, and the deploy target. Every capability maps to a
+        concrete containment need.</p>
+    </div>
+
+    <dl class="fmap">
+      <dt>Auth + RLS</dt>
+      <dd><b>6 roles</b> — <span class="mono">platform_admin · partner_admin · analyst · operator · approver · auditor</span>.
+        Authenticated members get scoped, read-only access; every write flows through an edge function under the
+        admin key, authorized from membership (never a client-supplied org id). Tenant isolation is asserted by
+        test: a FinTrust user cannot read SwiftCart's private signal batches or commitments.</dd>
+
+      <dt>Postgres</dt>
+      <dd><b>13 tables</b> behind a monotonic, server-enforced state machine —
+        <span class="mono">draft → awaiting_parties → running → protected_match → risk_scored → awaiting_approval → actioned → receipted</span>.
+        An illegal transition is rejected for <em>every</em> role, including admin. The audit ledger and the
+        finding tables are append-only by trigger, and <span class="mono">raw_records_shared = 0</span> is a hard
+        DB invariant.</dd>
+
+      <dt>Edge Functions</dt>
+      <dd><b>8 functions</b> —
+        <span class="pill">submit-signal-manifest</span><span class="pill">create-detection-run</span><span class="pill">dispatch-party-run</span><span class="pill">receive-worker-callback</span><span class="pill">request-action</span><span class="pill">approve-action</span><span class="pill">issue-receipt</span><span class="pill">verify-receipt</span>.
+        Worker callbacks are authenticated with HMAC-SHA256 over the exact signed envelope, a timestamp
+        freshness window, and a single-use nonce ledger for hard replay protection.</dd>
+
+      <dt>Realtime</dt>
+      <dd>Live progress on <span class="mono">run:{id}</span> and <span class="mono">org:{id}</span> channels,
+        carrying <b>safe metadata only</b> — phase, derived score, cardinality, and the always-zero raw counter,
+        never a signal or identifier. Channel-subscription RLS ensures only authorized viewers can subscribe.</dd>
+
+      <dt>Storage</dt>
+      <dd>A private <span class="mono">phylax-artifacts</span> bucket holds input packages, model artifacts,
+        signed run reports, and receipts. The database keeps only bucket/key pointers plus checksums — never the
+        raw evidence itself.</dd>
+
+      <dt>Custom Compute</dt>
+      <dd>Dockerized <b>SecretFlow party services</b> (Linux · Python&nbsp;3.10) run the long-lived
+        protected-compute agents beside each org's data, executing that party's share of the PSI and secure
+        aggregation.</dd>
+
+      <dt>Backend Branching</dt>
+      <dd>A <b>schema-only security branch</b> validates RLS and state-machine changes in isolation before they
+        are applied to the production control plane.</dd>
+
+      <dt>Sites</dt>
+      <dd>The operator console and this site deploy on <b>InsForge Sites</b>, served from the same project that
+        governs the data — one control plane, front to back.</dd>
+    </dl>
+  </section>
+
+  <!-- ======================= SECRETFLOW FEATURE MAP ======================= -->
+  <section>
+    <div class="sec-hd">
+      <span class="eyebrow">SecretFlow feature map</span>
+      <h2>The privacy-preserving computation, on the party side.</h2>
+      <p class="lede">SecretFlow performs the cryptography; it never touches the neutral plane. What leaves a
+        party is only what the protocol is designed to output.</p>
+    </div>
+
+    <dl class="fmap">
+      <dt>ECDH PSI</dt>
+      <dd><b>Private set intersection</b> across three parties —
+        <span class="mono">ECDH_PSI_3PC</span> (and <span class="mono">ECDH_PSI_2PC</span> for two), pinned to
+        <span class="mono">secretflow 1.10.0b1 / SPU 0.9.x</span>. The coordinator relays fully-blinded group
+        elements and learns only the intersection; non-matching tokens are never revealed.</dd>
+
+      <dt>Secure aggregation</dt>
+      <dd><b>Additive secret sharing</b> over a Mersenne-prime field computes consortium sums, means, and
+        moments for the permitted aggregate features. No party — and not the coordinator — ever sees another
+        party's individual value; only the aggregate leaves the protocol.</dd>
+
+      <dt>Federated risk model</dt>
+      <dd>A <b>real numeric model</b> — <span class="mono">phylax-risk 1.0.0</span>, logistic regression over
+        five features (<span class="mono">distinct_parties, matched_signatures, total_events, mean_velocity_z,
+        temporal_alignment</span>) — scores the matched cluster from those aggregates alone.</dd>
+
+      <dt>Local backend</dt>
+      <dd>A pure-stdlib <span class="mono">2048-bit MODP DDH-PSI</span> (RFC&nbsp;3526) implements the same
+        cryptographic family — commutative encryption in a DDH-hard group — for reproducibility and to run
+        anywhere. It yields identical results to the SecretFlow SPU backend.</dd>
+    </dl>
+  </section>
+
+  <!-- ======================= DEMO VS PRODUCTION ======================= -->
+  <section>
+    <div class="sec-hd">
+      <span class="eyebrow">Trust boundary · demo vs production</span>
+      <h2>Exactly where the demonstration ends.</h2>
+      <p class="lede">The protocol and the product are real and running. The infrastructure isolation is
+        modeled, not proven — and saying so plainly is part of the security posture.</p>
+    </div>
+
+    <div class="split">
+      <div class="panel">
+        <div class="panel-hd"><span class="eyebrow">Demo · today</span><span class="tag am">functional demonstration</span></div>
+        <ul class="demo">
+          <li><b>Synthetic data</b> generated from a fixed seed — no real customers, messages, or accounts.</li>
+          <li>All three parties plus control run in a <b>single InsForge account</b> (one topology).</li>
+          <li>Proves the <b>protocol, the state machine, and the product</b> end to end.</li>
+          <li><b>Not</b> proof of adversarial infrastructure isolation — the parties are not mutually distrusting hosts here.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <div class="panel-hd"><span class="eyebrow">Production · design</span><span class="tag cy">independent parties</span></div>
+        <ul class="prod">
+          <li>Each org runs its <b>own InsForge project</b>, its own party service, and <b>independent key material</b>.</li>
+          <li>The OPRF key is <b>jointly governed / threshold</b> — no single party can tokenize alone.</li>
+          <li><b>Per-org Ed25519 signing</b>; private keys never enter the control plane.</li>
+          <li>The neutral plane still centralizes <b>zero raw records</b> — the invariant does not change.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel disc">
+      <span class="d"><svg class="x" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="var(--faint)" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Not described as "encrypted end-to-end" — it is PSI + MPC, not E2EE</span>
+      <span class="d"><svg class="x" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="var(--faint)" stroke-width="1.5" stroke-linecap="round"/></svg>
+        No legal or compliance certification is claimed</span>
+      <span class="d"><svg class="x" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="var(--faint)" stroke-width="1.5" stroke-linecap="round"/></svg>
+        No automatic accusations — every action needs a human at the target org</span>
+    </div>
+  </section>
+
+  <!-- ======================= WHAT IS REAL ======================= -->
+  <section>
+    <div class="sec-hd">
+      <span class="eyebrow">What is real</span>
+      <h2>The checklist, without the hand-waving.</h2>
+    </div>
+    <div class="real">
+      <div>
+        <h4>Running now</h4>
+        <ul>
+          <li><svg class="ic" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--cyan)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            2048-bit MODP DDH-PSI executes locally; SecretFlow <span class="mono">ECDH_PSI_3PC</span> in production</li>
+          <li><svg class="ic" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--cyan)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Trained logistic-regression risk model — not an LLM, not a random score</li>
+          <li><svg class="ic" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--cyan)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Server-enforced monotonic state machine + append-only audit ledger</li>
+          <li><svg class="ic" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--cyan)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            RLS tenant isolation across partner-private tables</li>
+          <li><svg class="ic" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--cyan)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="mono">raw_records_shared = 0</span> as a hard DB invariant; HMAC + nonce replay guard on callbacks</li>
+        </ul>
+      </div>
+      <div class="warn">
+        <h4>Honestly still staged</h4>
+        <ul>
+          <li><svg class="ic" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="var(--amber)" stroke-width="1.5"/><path d="M8 5v4M8 11h.01" stroke="var(--amber)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Single-account demo topology — not isolated, mutually-distrusting infrastructure</li>
+          <li><svg class="ic" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="var(--amber)" stroke-width="1.5"/><path d="M8 5v4M8 11h.01" stroke="var(--amber)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Synthetic data only — no real customer signals</li>
+          <li><svg class="ic" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="var(--amber)" stroke-width="1.5"/><path d="M8 5v4M8 11h.01" stroke="var(--amber)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            No third-party security audit or compliance certification</li>
+          <li><svg class="ic" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="var(--amber)" stroke-width="1.5"/><path d="M8 5v4M8 11h.01" stroke="var(--amber)" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Threshold OPRF-key governance is designed, not yet deployed</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="close">
+    <span class="eyebrow">Next</span>
+    <h2>See the boundary in motion.</h2>
+    <p class="lede">The console runs the full pipeline live against the InsForge control plane; the sponsor page
+      details why every layer is InsForge-native.</p>
+    <div class="cta">
+      <a class="btn btn-primary btn-lg" href="/console">Open the console</a>
+      <a class="btn btn-lg" href="/sponsor">Why InsForge</a>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="in">
+    <span class="topo">synthetic / demo topology · real PSI + MPC · live InsForge control plane</span>
+    <span class="lk">
+      <a href="/">Home</a>
+      <a href="/console">Console</a>
+      <a href="/sponsor">Sponsor</a>
+    </span>
+  </div>
+</footer>
+
+</body>
+</html>

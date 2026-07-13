@@ -1,0 +1,22 @@
+{
+  "name": "phylax",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Phylax — privacy-preserving collective campaign-containment network",
+  "scripts": {
+    "build:functions": "node scripts/build-functions.mjs",
+    "deploy:functions": "node scripts/deploy-functions.mjs",
+    "seed:users": "node scripts/seed-users.mjs",
+    "dev": "node control-plane/server.mjs",
+    "verify:e2e": "node scripts/verify-e2e.mjs",
+    "test:node": "node --test tests/node",
+    "test:py": "python3 -m pytest parties/tests -q"
+  },
+  "dependencies": {
+    "@insforge/sdk": "^1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

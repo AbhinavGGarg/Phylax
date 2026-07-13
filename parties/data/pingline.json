@@ -1,0 +1,130 @@
+{
+  "org": "pingline",
+  "kind": "messaging",
+  "modality": "link_domain",
+  "blurb": "burst of near-identical messages carrying a short link",
+  "campaign": {
+    "join_kind": "campaign_artifact",
+    "signatures": [
+      "wallet:0x7f3a9b2c41e8",
+      "domain:secure-refund-desk.link",
+      "phone:+14155550142",
+      "handle:@rapid-payout-support"
+    ],
+    "local": {
+      "events": 9,
+      "velocity_z": 2.6,
+      "peak_hour": 13.9
+    }
+  },
+  "noise": [
+    {
+      "raw": "msg-link-9535-0",
+      "events": 4,
+      "velocity_z": 1.27,
+      "peak_hour": 3.5
+    },
+    {
+      "raw": "msg-link-5545-1",
+      "events": 4,
+      "velocity_z": 0.27,
+      "peak_hour": 14.0
+    },
+    {
+      "raw": "msg-link-2526-2",
+      "events": 4,
+      "velocity_z": 0.76,
+      "peak_hour": 5.8
+    },
+    {
+      "raw": "msg-link-1661-3",
+      "events": 4,
+      "velocity_z": 0.14,
+      "peak_hour": 13.4
+    },
+    {
+      "raw": "msg-link-3123-4",
+      "events": 2,
+      "velocity_z": 0.51,
+      "peak_hour": 18.1
+    },
+    {
+      "raw": "msg-link-5602-5",
+      "events": 1,
+      "velocity_z": 1.27,
+      "peak_hour": 20.4
+    },
+    {
+      "raw": "msg-link-9593-6",
+      "events": 4,
+      "velocity_z": 0.91,
+      "peak_hour": 16.8
+    },
+    {
+      "raw": "msg-link-2175-7",
+      "events": 1,
+      "velocity_z": 0.66,
+      "peak_hour": 2.1
+    },
+    {
+      "raw": "msg-link-2129-8",
+      "events": 4,
+      "velocity_z": 0.51,
+      "peak_hour": 19.4
+    },
+    {
+      "raw": "msg-link-3536-9",
+      "events": 4,
+      "velocity_z": 0.19,
+      "peak_hour": 11.9
+    },
+    {
+      "raw": "msg-link-9630-10",
+      "events": 2,
+      "velocity_z": 1.14,
+      "peak_hour": 22.1
+    },
+    {
+      "raw": "msg-link-2376-11",
+      "events": 4,
+      "velocity_z": 0.19,
+      "peak_hour": 1.1
+    },
+    {
+      "raw": "msg-link-5412-12",
+      "events": 1,
+      "velocity_z": 0.18,
+      "peak_hour": 4.3
+    },
+    {
+      "raw": "msg-link-2807-13",
+      "events": 1,
+      "velocity_z": 0.21,
+      "peak_hour": 5.7
+    },
+    {
+      "raw": "msg-link-4882-14",
+      "events": 1,
+      "velocity_z": 0.4,
+      "peak_hour": 22.0
+    },
+    {
+      "raw": "msg-link-7508-15",
+      "events": 4,
+      "velocity_z": 1.12,
+      "peak_hour": 6.8
+    },
+    {
+      "raw": "msg-link-4259-16",
+      "events": 4,
+      "velocity_z": 0.79,
+      "peak_hour": 20.5
+    },
+    {
+      "raw": "msg-link-8050-17",
+      "events": 2,
+      "velocity_z": 0.15,
+      "peak_hour": 6.6
+    }
+  ]
+}

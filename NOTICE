@@ -1,0 +1,21 @@
+Phylax
+======
+
+This product depends on SecretFlow (https://github.com/secretflow/secretflow)
+for its privacy-preserving computation (Private Set Intersection and secure
+aggregation via the SPU device).
+
+  SecretFlow
+  Copyright 2023 Ant Group Co., Ltd.
+  Licensed under the Apache License, Version 2.0 (the "License").
+  You may obtain a copy of the License at
+      http://www.apache.org/licenses/LICENSE-2.0
+
+Phylax does not fork or modify SecretFlow; it depends on the published
+`secretflow` package (pinned in parties/requirements-secretflow.txt) and invokes
+its documented, stable PSI API (SPU `psi_csv` / `psi_df` with the
+`ECDH_PSI_3PC` protocol). See parties/common/psi_secretflow.py.
+
+The pure-Python MODP DDH-PSI backend in parties/common/psi.py is original Phylax
+code implementing the same Decisional-Diffie-Hellman commutative-encryption
+protocol family, used so the demo is reproducible without native wheels.

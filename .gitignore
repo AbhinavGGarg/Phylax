@@ -1,0 +1,27 @@
+# secrets & local env
+.env
+.env.local
+.env*.local
+
+# node / python / generated
+node_modules/
+insforge/functions/_dist/
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+
+# InsForge & AI agent skills
+.insforge
+.agent
+.agents
+.augment
+.claude
+.cline
+.github/copilot*
+.kilocode
+.qoder
+.qwen
+.roo
+.trae
+.windsurf

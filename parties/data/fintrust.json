@@ -1,0 +1,106 @@
+{
+  "org": "fintrust",
+  "kind": "bank",
+  "modality": "payee_cluster",
+  "blurb": "unusual payout velocity to a newly-seen payee cluster",
+  "campaign": {
+    "join_kind": "campaign_artifact",
+    "signatures": [
+      "wallet:0x7f3a9b2c41e8",
+      "domain:secure-refund-desk.link",
+      "phone:+14155550142",
+      "handle:@rapid-payout-support"
+    ],
+    "local": {
+      "events": 5,
+      "velocity_z": 2.3,
+      "peak_hour": 14.2
+    }
+  },
+  "noise": [
+    {
+      "raw": "payee-cluster-8028-0",
+      "events": 1,
+      "velocity_z": 0.61,
+      "peak_hour": 1.5
+    },
+    {
+      "raw": "payee-cluster-3715-1",
+      "events": 4,
+      "velocity_z": 0.27,
+      "peak_hour": 16.1
+    },
+    {
+      "raw": "payee-cluster-6967-2",
+      "events": 4,
+      "velocity_z": 1.37,
+      "peak_hour": 16.3
+    },
+    {
+      "raw": "payee-cluster-7004-3",
+      "events": 2,
+      "velocity_z": 1.14,
+      "peak_hour": 4.4
+    },
+    {
+      "raw": "payee-cluster-8986-4",
+      "events": 2,
+      "velocity_z": 0.7,
+      "peak_hour": 17.1
+    },
+    {
+      "raw": "payee-cluster-7811-5",
+      "events": 2,
+      "velocity_z": 0.13,
+      "peak_hour": 20.0
+    },
+    {
+      "raw": "payee-cluster-8675-6",
+      "events": 2,
+      "velocity_z": 1.38,
+      "peak_hour": 4.2
+    },
+    {
+      "raw": "payee-cluster-2783-7",
+      "events": 3,
+      "velocity_z": 0.31,
+      "peak_hour": 2.2
+    },
+    {
+      "raw": "payee-cluster-6145-8",
+      "events": 1,
+      "velocity_z": 0.93,
+      "peak_hour": 6.2
+    },
+    {
+      "raw": "payee-cluster-9496-9",
+      "events": 1,
+      "velocity_z": 0.35,
+      "peak_hour": 7.0
+    },
+    {
+      "raw": "payee-cluster-6233-10",
+      "events": 2,
+      "velocity_z": 0.4,
+      "peak_hour": 14.9
+    },
+    {
+      "raw": "payee-cluster-2961-11",
+      "events": 3,
+      "velocity_z": 0.59,
+      "peak_hour": 8.8
+    },
+    {
+      "raw": "payee-cluster-5593-12",
+      "events": 4,
+      "velocity_z": 0.53,
+      "peak_hour": 23.6
+    },
+    {
+      "raw": "payee-cluster-1195-13",
+      "events": 1,
+      "velocity_z": 0.29,
+      "peak_hour": 15.6
+    }
+  ]
+}

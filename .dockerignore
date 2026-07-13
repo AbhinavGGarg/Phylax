@@ -1,0 +1,20 @@
+# keep build contexts small + secret-free
+.git
+.env
+.env.local
+.env*.local
+.insforge
+.agents
+.claude
+node_modules
+web
+control-plane
+tests
+scripts
+docs
+migrations
+insforge/functions/_dist
+**/__pycache__
+**/*.pyc
+.pytest_cache
+*.md

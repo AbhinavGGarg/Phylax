@@ -1,0 +1,37 @@
+# PHYLAX · protected coordinator/runner image.
+# Runs parties/coordinator_service.py (FastAPI) — the HTTP entrypoint that
+# InsForge `dispatch-party-run` would POST to in production. It drives the REAL
+# PSI/MPC sweep and returns opaque campaign id + permitted aggregates + signed
+# callbacks only. Uses the stdlib DDH backend (PHYLAX_PSI_BACKEND=modp-ddh);
+# for the SecretFlow SPU backend use Dockerfile.secretflow instead.
+#
+# BUILD CONTEXT = repo root (COPY paths are `parties/...`). Build with either:
+#   docker build -f parties/Dockerfile.coordinator -t phylax/coordinator .
+#   docker compose build coordinator
+# NOT built in this environment (no docker daemon).
+FROM python:3.11-slim
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PHYLAX_PSI_BACKEND=modp-ddh
+
+WORKDIR /app
+
+# Install deps first for layer caching.
+COPY parties/requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the parties/ tree (common/, data/, *_service.py, coordinator.py) to /app.
+COPY parties/ ./
+
+# Run as a non-root user.
+RUN useradd --create-home --uid 10001 phylax && chown -R phylax:phylax /app
+USER phylax
+
+EXPOSE 8090
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD python -c 'import urllib.request,sys; sys.exit(0 if urllib.request.urlopen("http://127.0.0.1:8090/health",timeout=4).status==200 else 1)'
+
+CMD ["uvicorn", "coordinator_service:app", "--host", "0.0.0.0", "--port", "8090"]

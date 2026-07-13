@@ -1,0 +1,138 @@
+# PHYLAX · party compute layer (docker-compose)
+# =============================================================================
+# This file provisions ONLY the privacy-preserving COMPUTE layer: the protected
+# coordinator/runner plus one detection-agent service per partner org.
+#
+# The Phylax CONTROL PLANE — Postgres, Auth, RLS, Realtime, Storage, and the edge
+# functions (create-detection-run, dispatch-party-run, receive-worker-callback,
+# approve-action, issue-receipt, verify-receipt) — is InsForge cloud (project
+# kd6vibk3, https://kd6vibk3.us-east.insforge.app). It is NOT a service here;
+# nothing in this file runs Postgres or the edge functions. This compose is the
+# party compute layer only.
+#
+# TRUST BOUNDARY (documented honestly):
+#   • DEMO (this compose): every party service AND the coordinator run in ONE
+#     host / one account. This is a FUNCTIONAL demo of the protocol, its wire
+#     formats, and the signed callbacks — it is NOT adversarial isolation (a root
+#     operator on this host could read any container's memory). In the demo the
+#     coordinator computes the whole sweep in-process (it loads each org's data
+#     itself); the party services below expose the SAME core over HTTP to make the
+#     true distributed topology tangible.
+#   • PRODUCTION: each organization runs ITS OWN party service, in ITS OWN
+#     infrastructure / InsForge project, holding ITS OWN data + key material, so a
+#     raw token or secret exponent never leaves that org's process. The
+#     coordinator relays only blinded group elements + signed aggregates.
+#
+# NOT built in this environment (no docker daemon). Build + run with:
+#   docker compose up --build
+# Shared secrets (PHYLAX_JOINT_SECRET, WORKER_HMAC_SECRET, PHYLAX_PSI_BACKEND,
+# ...) come from .env.local via env_file. Flip the PSI backend by editing
+# PHYLAX_PSI_BACKEND in .env.local (modp-ddh | secretflow); note the secretflow
+# value only works on the Dockerfile.secretflow image (see coordinator-secretflow
+# below) — on the stdlib image it fails closed with a PSIError by design.
+# =============================================================================
+services:
+  coordinator:
+    build:
+      context: .
+      dockerfile: parties/Dockerfile.coordinator
+    image: phylax/coordinator:1.0.0
+    env_file: [.env.local]
+    ports: ["8090:8090"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8090/health',timeout=4).status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    # In the demo the coordinator computes in-process; depends_on models the
+    # PRODUCTION topology where it would call each party service in turn.
+    depends_on:
+      party-fintrust: {condition: service_healthy}
+      party-swiftcart: {condition: service_healthy}
+      party-pingline: {condition: service_healthy}
+    restart: unless-stopped
+
+  party-fintrust:
+    build:
+      context: .
+      dockerfile: parties/Dockerfile.party
+    image: phylax/party:1.0.0
+    env_file: [.env.local]
+    environment:
+      PHYLAX_ORG: fintrust
+    ports: ["8091:8091"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8091/health',timeout=4).status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+  party-swiftcart:
+    build:
+      context: .
+      dockerfile: parties/Dockerfile.party
+    image: phylax/party:1.0.0
+    env_file: [.env.local]
+    environment:
+      PHYLAX_ORG: swiftcart
+    # host 8092 -> container's internal 8091
+    ports: ["8092:8091"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8091/health',timeout=4).status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+  party-pingline:
+    build:
+      context: .
+      dockerfile: parties/Dockerfile.party
+    image: phylax/party:1.0.0
+    env_file: [.env.local]
+    environment:
+      PHYLAX_ORG: pingline
+    # host 8093 -> container's internal 8091
+    ports: ["8093:8091"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8091/health',timeout=4).status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # REAL SecretFlow SPU coordinator (production PSI backend). Commented out: the
+  # SecretFlow image is large (Linux + Python 3.10/3.11 only) and is NOT built in
+  # this environment. It binds the SAME host port 8090 as `coordinator`, so run
+  # ONE OR THE OTHER, not both. To route the protected match through SecretFlow
+  # SPU's ECDH_PSI_3PC instead of the stdlib DDH backend:
+  #   1. stop the stdlib coordinator:   docker compose stop coordinator
+  #   2. bring up this service:         docker compose up --build coordinator-secretflow
+  #   3. point the host/dispatch at :8090 on this service.
+  #
+  # coordinator-secretflow:
+  #   build:
+  #     context: .
+  #     dockerfile: parties/Dockerfile.secretflow
+  #   image: phylax/coordinator-secretflow:1.0.0
+  #   env_file: [.env.local]
+  #   environment:
+  #     PHYLAX_PSI_BACKEND: secretflow   # overrides .env.local for this service
+  #   ports: ["8090:8090"]
+  #   healthcheck:
+  #     test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8090/health',timeout=8).status==200 else 1)"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 30s
+  #   depends_on:
+  #     party-fintrust: {condition: service_healthy}
+  #     party-swiftcart: {condition: service_healthy}
+  #     party-pingline: {condition: service_healthy}
+  #   restart: unless-stopped

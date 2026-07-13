@@ -1,0 +1,118 @@
+{
+  "org": "swiftcart",
+  "kind": "marketplace",
+  "modality": "seller_handle",
+  "blurb": "seller steering buyers to settle off-platform",
+  "campaign": {
+    "join_kind": "campaign_artifact",
+    "signatures": [
+      "wallet:0x7f3a9b2c41e8",
+      "domain:secure-refund-desk.link",
+      "phone:+14155550142",
+      "handle:@rapid-payout-support"
+    ],
+    "local": {
+      "events": 7,
+      "velocity_z": 1.9,
+      "peak_hour": 14.6
+    }
+  },
+  "noise": [
+    {
+      "raw": "seller-1960-0",
+      "events": 2,
+      "velocity_z": 1.22,
+      "peak_hour": 2.2
+    },
+    {
+      "raw": "seller-7181-1",
+      "events": 2,
+      "velocity_z": 0.63,
+      "peak_hour": 9.0
+    },
+    {
+      "raw": "seller-7568-2",
+      "events": 2,
+      "velocity_z": 0.89,
+      "peak_hour": 1.2
+    },
+    {
+      "raw": "seller-9079-3",
+      "events": 2,
+      "velocity_z": 1.28,
+      "peak_hour": 17.6
+    },
+    {
+      "raw": "seller-3435-4",
+      "events": 1,
+      "velocity_z": 0.83,
+      "peak_hour": 2.4
+    },
+    {
+      "raw": "seller-7662-5",
+      "events": 2,
+      "velocity_z": 0.23,
+      "peak_hour": 21.2
+    },
+    {
+      "raw": "seller-8119-6",
+      "events": 1,
+      "velocity_z": 0.81,
+      "peak_hour": 19.0
+    },
+    {
+      "raw": "seller-2462-7",
+      "events": 3,
+      "velocity_z": 0.55,
+      "peak_hour": 9.6
+    },
+    {
+      "raw": "seller-3442-8",
+      "events": 1,
+      "velocity_z": 0.89,
+      "peak_hour": 0.1
+    },
+    {
+      "raw": "seller-6527-9",
+      "events": 2,
+      "velocity_z": 1.2,
+      "peak_hour": 18.6
+    },
+    {
+      "raw": "seller-3257-10",
+      "events": 4,
+      "velocity_z": 1.38,
+      "peak_hour": 5.2
+    },
+    {
+      "raw": "seller-1630-11",
+      "events": 1,
+      "velocity_z": 0.58,
+      "peak_hour": 4.4
+    },
+    {
+      "raw": "seller-2885-12",
+      "events": 3,
+      "velocity_z": 0.79,
+      "peak_hour": 5.2
+    },
+    {
+      "raw": "seller-2461-13",
+      "events": 2,
+      "velocity_z": 0.77,
+      "peak_hour": 8.6
+    },
+    {
+      "raw": "seller-1350-14",
+      "events": 4,
+      "velocity_z": 0.17,
+      "peak_hour": 3.1
+    },
+    {
+      "raw": "seller-2987-15",
+      "events": 4,
+      "velocity_z": 1.27,
+      "peak_hour": 19.7
+    }
+  ]
+}

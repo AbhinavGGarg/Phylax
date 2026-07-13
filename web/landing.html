@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Phylax · Prove the campaign. Share nothing.</title>
+<meta name="description" content="Phylax is a privacy-preserving collective scam-campaign-containment network. Three platforms prove a coordinated ring together — without sharing a single raw record."/>
+<link rel="stylesheet" href="/assets/phylax.css"/>
+<style>
+  :root{ --maxw:1180px }
+  a:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:6px}
+
+  /* ---- shared shell: top bar + wrap + footer ---- */
+  .top{position:sticky;top:0;z-index:30;backdrop-filter:blur(12px);
+    background:linear-gradient(180deg,rgba(5,7,14,.9),rgba(5,7,14,.55));border-bottom:1px solid var(--line)}
+  .top .in{max-width:var(--maxw);margin:0 auto;display:flex;align-items:center;justify-content:space-between;
+    gap:14px;padding:13px 24px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:16px;min-width:0}
+  .brand .tagline{border-left:1px solid var(--line);padding-left:16px}
+  .nav{display:flex;gap:2px;flex-wrap:wrap}
+  .nav a{font-size:13px;color:var(--dim);padding:7px 11px;border-radius:8px;transition:.15s}
+  .nav a:hover{color:var(--ink);background:rgba(20,29,49,.6)}
+  .nav a[aria-current="page"]{color:var(--ink);background:rgba(20,29,49,.72)}
+  .wrap{position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  section{padding:clamp(54px,8vw,104px) 0;border-top:1px solid var(--line)}
+  section:first-of-type{border-top:0}
+  .sec-hd{max-width:720px;margin-bottom:34px}
+  .sec-hd h2{font-size:clamp(26px,3.4vw,40px);margin-top:12px}
+  .sec-hd .lede{margin-top:14px}
+
+  /* ---- hero ---- */
+  .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(28px,4vw,64px);align-items:center;
+    padding:clamp(48px,7vw,92px) 0 clamp(40px,6vw,72px)}
+  .hero h1{font-size:clamp(40px,6.4vw,82px);font-weight:700;letter-spacing:-0.045em;line-height:.98}
+  .hero h1 .soft{color:var(--dim);font-weight:600}
+  .hero .lede{margin:22px 0 28px;max-width:52ch}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .thesis{display:inline-flex;align-items:center;gap:12px;margin-top:30px;font-family:var(--mono);
+    font-size:12.5px;color:var(--faint);letter-spacing:.02em}
+  .thesis .mv{color:var(--iris)} .thesis .zr{color:var(--cyan)}
+  .thesis .rule{width:26px;height:1px;background:var(--line-2)}
+
+  /* ---- hero seal panel (the signature) ---- */
+  .seal{padding:22px}
+  .frag{display:flex;align-items:center;gap:11px;padding:11px 12px;border:1px solid var(--line);
+    border-radius:11px;background:rgba(12,18,32,.55);margin-bottom:9px}
+  .frag .who{font-size:12.5px;font-weight:600;white-space:nowrap}
+  .frag .what{font-size:11.5px;color:var(--dim);line-height:1.3;flex:1;min-width:0}
+  .frag .risk{font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .membrane{display:flex;align-items:center;gap:12px;margin:16px 2px}
+  .membrane .ln{flex:1;height:1px;background:repeating-linear-gradient(90deg,var(--line-2) 0 7px,transparent 7px 13px)}
+  .membrane .tx{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+  .zerowrap{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 0 4px}
+  .zero-seal{position:relative;width:150px;height:150px;display:grid;place-items:center;border-radius:50%;
+    border:1px solid rgba(53,224,212,.35);
+    background:radial-gradient(circle at 50% 42%,rgba(53,224,212,.14),transparent 62%)}
+  .zero-seal::before,.zero-seal::after{content:"";position:absolute;border-radius:50%;border:1px solid var(--line)}
+  .zero-seal::before{inset:14px;border-color:rgba(53,224,212,.16)}
+  .zero-seal::after{inset:30px;border-color:rgba(53,224,212,.1);
+    box-shadow:0 0 60px -8px var(--glow-cyan);animation:breathe 5.5s ease-in-out infinite}
+  @keyframes breathe{0%,100%{opacity:.5}50%{opacity:1}}
+  .zero-seal .n{font-family:var(--mono);font-weight:600;font-size:64px;color:var(--cyan);
+    text-shadow:0 0 26px var(--glow-cyan);line-height:1}
+  .zerowrap .cap{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+  .proof{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;
+    padding-top:15px;border-top:1px solid var(--line)}
+  .proof .lab{font-size:11.5px;color:var(--faint)}
+  .proof .big{font-family:var(--mono);font-size:26px;font-weight:600;color:var(--crimson);
+    text-shadow:0 0 16px var(--glow-crim)}
+
+  /* ---- telemetry strip ---- */
+  .strip{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .strip .in{max-width:var(--maxw);margin:0 auto;padding:18px 24px;display:flex;flex-wrap:wrap;
+    gap:12px 30px;align-items:center;justify-content:space-between}
+  .stat{display:flex;flex-direction:column;gap:3px}
+  .stat b{font-family:var(--mono);font-size:20px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+  .stat b.cy{color:var(--cyan)} .stat b.cr{color:var(--crimson)}
+  .stat span{font-size:11px;color:var(--faint);letter-spacing:.02em}
+
+  /* ---- problem ---- */
+  .prob{display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,3vw,44px);align-items:start}
+  .frag-list .frag{margin-bottom:11px}
+  .prob .kicker{font-family:var(--mono);font-size:12px;color:var(--amber);margin-bottom:8px}
+  .verdict-line{display:flex;align-items:center;gap:10px;margin-top:16px;font-size:13px;color:var(--dim)}
+  .verdict-line .dot{flex-shrink:0}
+
+  /* ---- pipeline (typed sequence) ---- */
+  .pipe{max-width:840px}
+  .step{display:grid;grid-template-columns:auto 1fr;gap:22px}
+  .step .rail{display:flex;flex-direction:column;align-items:center;width:40px}
+  .step .num{width:40px;height:40px;border-radius:11px;border:1px solid var(--line-2);display:grid;place-items:center;
+    font-family:var(--mono);font-size:14px;color:var(--cyan);background:rgba(20,29,49,.5);flex-shrink:0}
+  .step .bar{flex:1;width:1px;background:var(--line);margin:8px 0}
+  .step:last-child .bar{display:none}
+  .step .body{padding-bottom:30px;min-width:0}
+  .step h3{font-size:19px;font-weight:600;letter-spacing:-.02em}
+  .step p{color:var(--dim);font-size:14px;margin:8px 0 12px;max-width:60ch;line-height:1.55}
+  .step .meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .carry{font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .carry b{color:var(--cyan);font-weight:500}
+  .carry.none b{color:var(--dim)}
+
+  /* ---- honest facts ---- */
+  .facts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .fact{padding:18px}
+  .fact h4{font-size:14px;font-weight:600;display:flex;align-items:center;gap:9px}
+  .fact .tk{width:16px;height:16px;flex-shrink:0}
+  .fact p{color:var(--dim);font-size:13px;margin:9px 0 0;line-height:1.55}
+  .fact.warn h4{color:#ffd694}
+
+  /* ---- AI company ---- */
+  .company{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .company .panel-pad{padding:22px}
+  .paywall .kv .v{color:var(--ink)}
+  .airow{display:grid;grid-template-columns:96px 1fr;gap:14px;padding:13px 0;border-bottom:1px dashed var(--line)}
+  .airow:last-child{border-bottom:0}
+  .airow .t{font-family:var(--mono);font-size:12px;color:var(--cyan);letter-spacing:.06em;padding-top:2px}
+  .airow .d{font-size:13px;color:var(--dim);line-height:1.5}
+  .airow .d b{color:var(--ink);font-weight:600}
+  .nochat{margin-top:16px;font-size:12px;color:var(--faint);font-family:var(--mono)}
+
+  /* ---- closing cta ---- */
+  .close{text-align:center;padding:clamp(60px,9vw,120px) 0}
+  .close h2{font-size:clamp(28px,4.4vw,52px);letter-spacing:-.04em;max-width:16ch;margin:0 auto}
+  .close .lede{margin:20px auto 30px;max-width:56ch}
+  .close .cta{justify-content:center}
+
+  /* ---- footer ---- */
+  .foot{border-top:1px solid var(--line)}
+  .foot .in{max-width:var(--maxw);margin:0 auto;padding:26px 24px;display:flex;flex-wrap:wrap;gap:14px;
+    align-items:center;justify-content:space-between}
+  .foot .topo{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.02em}
+  .foot .lk{display:flex;gap:16px}
+  .foot .lk a{font-size:12.5px;color:var(--dim)}
+  .foot .lk a:hover{color:var(--ink)}
+
+  @media(max-width:920px){
+    .hero{grid-template-columns:1fr;gap:34px}
+    .prob,.facts,.company{grid-template-columns:1fr}
+    .brand .tagline{display:none}
+  }
+</style>
+</head>
+<body class="grid-bg">
+
+<header class="top">
+  <div class="in">
+    <div class="brand">
+      <span class="wordmark"><span class="phi">Φ</span>YLAX</span>
+      <span class="eyebrow tagline">Collective Campaign Containment</span>
+    </div>
+    <nav class="nav" aria-label="Primary">
+      <a href="/" aria-current="page">Home</a>
+      <a href="/console">Console</a>
+      <a href="/architecture">Architecture</a>
+      <a href="/sponsor">Sponsor</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ======================= HERO ======================= -->
+  <section class="hero" style="border-top:0">
+    <div>
+      <span class="eyebrow">Privacy-preserving trust &amp; safety network</span>
+      <h1>Prove the campaign.<br><span class="soft">Share nothing.</span></h1>
+      <p class="lede">Three companies each hold a scam fragment too weak to act on alone. Phylax lets them
+        prove a single coordinated campaign <em>together</em> — without exposing customer identities, raw
+        messages, private watchlists, or embeddings — then coordinate the smallest safe intervention.</p>
+      <div class="cta">
+        <a class="btn btn-primary btn-lg" href="/console">Open the console</a>
+        <a class="btn btn-lg" href="/architecture">How it works</a>
+      </div>
+      <div class="thesis">
+        <span class="mv">data moves</span><span class="rule"></span>
+        <span class="zr">0 is shared</span>
+      </div>
+    </div>
+
+    <!-- signature: fragments -> sealed 0 membrane -> proof -->
+    <div class="panel seal">
+      <div class="panel-hd" style="margin:-22px -22px 18px;border-radius:14px 14px 0 0">
+        <span class="eyebrow">Protected match</span>
+        <span class="tag cy mono">psi · ecdh_psi_3pc</span>
+      </div>
+
+      <div class="frag-list" aria-label="Three weak fragments">
+        <div class="frag"><span class="dot warn"></span><span class="who">FinTrust</span>
+          <span class="what">unusual payout velocity to a newly-seen payee cluster</span>
+          <span class="risk">0.77%</span></div>
+        <div class="frag"><span class="dot warn"></span><span class="who">SwiftCart</span>
+          <span class="what">seller steering buyers to settle off-platform</span>
+          <span class="risk">0.82%</span></div>
+        <div class="frag"><span class="dot warn"></span><span class="who">PingLine</span>
+          <span class="what">burst of near-identical messages carrying a short link</span>
+          <span class="risk">2.79%</span></div>
+      </div>
+
+      <div class="membrane"><span class="ln"></span><span class="tx">trust membrane</span><span class="ln"></span></div>
+
+      <div class="zerowrap">
+        <div class="zero-seal" role="img" aria-label="Zero raw records shared"><span class="n">0</span></div>
+        <span class="cap">raw records crossed</span>
+      </div>
+
+      <div class="proof">
+        <div>
+          <div class="lab">coordinated campaign · proven</div>
+          <div class="mono" style="font-size:12px;color:var(--dim);margin-top:3px">4 shared signatures · 3 platforms</div>
+        </div>
+        <div style="text-align:right">
+          <div class="big">99.98%</div>
+          <div class="lab">collective risk</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ======================= TELEMETRY STRIP ======================= -->
+<div class="strip">
+  <div class="in">
+    <div class="stat"><b>3</b><span>platforms co-observing</span></div>
+    <div class="stat"><b>4</b><span>shared signatures (PSI)</span></div>
+    <div class="stat"><b class="cy">0</b><span>raw records shared</span></div>
+    <div class="stat"><b>~6&nbsp;s</b><span>protected match</span></div>
+    <div class="stat"><b class="cr">99.98%</b><span>collective vs &lt;3% solo</span></div>
+    <div class="stat"><b>1</b><span>human approval per action</span></div>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <!-- ======================= THE PROBLEM ======================= -->
+  <section>
+    <div class="sec-hd">
+      <span class="eyebrow">The problem</span>
+      <h2>Scam rings are cross-platform. Every platform sees a splinter.</h2>
+      <p class="lede">A single ring launders through a bank, recruits on a marketplace, and sprays links over a
+        messenger. No one platform sees enough to act — and the raw evidence that would connect the dots is
+        exactly the data they are not allowed to pool.</p>
+    </div>
+
+    <div class="prob">
+      <div class="frag-list">
+        <div class="prob-kicker eyebrow" style="color:var(--amber);margin-bottom:10px">each fragment · below its own action threshold</div>
+        <div class="frag"><span class="dot warn"></span><span class="who">FinTrust</span>
+          <span class="what">unusual payout velocity to a newly-seen payee cluster</span>
+          <span class="risk">0.77%</span></div>
+        <div class="frag"><span class="dot warn"></span><span class="who">SwiftCart</span>
+          <span class="what">seller steering buyers to settle off-platform</span>
+          <span class="risk">0.82%</span></div>
+        <div class="frag"><span class="dot warn"></span><span class="who">PingLine</span>
+          <span class="what">burst of near-identical messages carrying a short link</span>
+          <span class="risk">2.79%</span></div>
+        <div class="verdict-line"><span class="dot"></span> Individually: noise. Nobody has standing to intervene.</div>
+      </div>
+
+      <div>
+        <p class="lede" style="font-size:16px">The obvious fix — pool the raw signals — is the one thing they
+          <b style="color:var(--ink);font-weight:600">cannot</b> do.</p>
+        <div class="panel panel-pad" style="margin-top:16px">
+          <div class="kv"><span class="k">Share customer identities</span><span class="v" style="color:var(--crimson)">unlawful</span></div>
+          <div class="kv"><span class="k">Share raw messages</span><span class="v" style="color:var(--crimson)">unlawful</span></div>
+          <div class="kv"><span class="k">Share private watchlists</span><span class="v" style="color:var(--crimson)">unsafe</span></div>
+          <div class="kv"><span class="k">Share embeddings / vectors</span><span class="v" style="color:var(--crimson)">leaks raw</span></div>
+          <div class="kv"><span class="k">So they share nothing</span><span class="v" style="color:var(--amber)">ring wins</span></div>
+        </div>
+        <p class="muted" style="font-size:13px;color:var(--faint);margin-top:14px;line-height:1.55">
+          Regulation, contracts, and basic customer safety all forbid centralizing the evidence. So the
+          default posture is silence — and coordinated fraud is precisely what thrives in the gaps between
+          isolated defenders.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= HOW IT WORKS ======================= -->
+  <section>
+    <div class="sec-hd">
+      <span class="eyebrow">How Phylax works</span>
+      <h2>A five-step protected pipeline. Data stays home; only proof moves.</h2>
+      <p class="lede">Every step is engineered so that what crosses the trust membrane is opaque or aggregate —
+        never a raw record. The numbering is earned: each stage strictly follows the last.</p>
+    </div>
+
+    <div class="pipe">
+      <div class="step">
+        <div class="rail"><span class="num">01</span><span class="bar"></span></div>
+        <div class="body">
+          <h3>Local signals</h3>
+          <p>Each party derives anomaly signals over its own data, inside its own perimeter. A bank's payout
+            velocity, a marketplace's off-platform steering, a messenger's link bursts — computed locally,
+            under that org's own row-level security.</p>
+          <div class="meta"><span class="tag cy">on-prem</span>
+            <span class="carry none">crosses membrane: <b>nothing</b></span></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="rail"><span class="num">02</span><span class="bar"></span></div>
+        <div class="body">
+          <h3>OPRF-tokenized commitments</h3>
+          <p>Candidate campaign signatures — wallets, domains, handles — are turned into opaque commitments
+            under a jointly-governed key. No party can enumerate another's inputs; the control plane stores
+            commitments, never values.</p>
+          <div class="meta"><span class="tag cy mono">oprf-ristretto255 + keyed-normalize</span>
+            <span class="carry">crosses membrane: <b>opaque commitments</b></span></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="rail"><span class="num">03</span><span class="bar"></span></div>
+        <div class="body">
+          <h3>Protected match</h3>
+          <p>An ECDH / DDH private-set-intersection runs across the three party agents. The coordinator relays
+            fully-blinded group elements and learns only the <em>intersection</em> — the shared signatures.
+            Non-matching tokens are never revealed to anyone.</p>
+          <div class="meta"><span class="tag cy mono">ECDH_PSI_3PC · 2048-bit MODP DDH</span>
+            <span class="carry">crosses membrane: <b>opaque group elements</b></span></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="rail"><span class="num">04</span><span class="bar"></span></div>
+        <div class="body">
+          <h3>Federated risk score</h3>
+          <p>A real trained logistic regression scores the cluster over five permitted aggregate features —
+            produced by secure aggregation, never by reading raw records. Not an LLM, not a random number: a
+            numeric model with a published feature spec and a params hash.</p>
+          <div class="meta"><span class="tag cr mono">phylax-risk 1.0.0</span>
+            <span class="carry">crosses membrane: <b>5 aggregate features</b></span></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="rail"><span class="num">05</span><span class="bar"></span></div>
+        <div class="body">
+          <h3>Human-approved action · signed receipt</h3>
+          <p>Phylax recommends the smallest proportionate response — hold a payout, quarantine a listing, warn
+            recipients. A human at the <em>target</em> org approves it; nothing executes automatically. The
+            decision is sealed into an append-only ledger and a signed receipt.</p>
+          <div class="meta"><span class="tag em mono">Ed25519 receipt</span>
+            <span class="carry">crosses membrane: <b>signed decision hash</b></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= REAL, NOT THEATER ======================= -->
+  <section>
+    <div class="sec-hd">
+      <span class="eyebrow">Real, not theater</span>
+      <h2>What is actually running — and what is honestly still a demo.</h2>
+      <p class="lede">Security products earn trust by being precise about their own limits. Here is the honest
+        boundary between the cryptography that runs and the topology that is staged for the hackathon.</p>
+    </div>
+
+    <div class="facts">
+      <div class="panel fact">
+        <h4><svg class="tk" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--cyan)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          The protocol execution is real</h4>
+        <p>Protected match runs a genuine ECDH / DDH private-set-intersection: RFC&nbsp;3526 2048-bit MODP
+          locally for reproducibility, and SecretFlow SPU <span class="mono">ECDH_PSI_3PC</span> in production.
+          Same cryptographic family, identical results.</p>
+      </div>
+      <div class="panel fact">
+        <h4><svg class="tk" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--cyan)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          The risk model is a trained model</h4>
+        <p>A logistic regression over five aggregate features, fit offline by gradient descent and verified to
+          reproduce from seed. It is <b style="color:var(--ink)">not an LLM</b> and <b style="color:var(--ink)">not a random score</b> — it ships with a feature spec and a params hash.</p>
+      </div>
+      <div class="panel fact">
+        <h4><svg class="tk" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--cyan)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          The control plane stores zero raw records</h4>
+        <p>The neutral InsForge project holds commitments, aggregate findings, hashes, and receipts — never a
+          message, identity, account number, watchlist, or vector. <span class="mono">raw_records_shared = 0</span>
+          is a hard database invariant, enforced by trigger.</p>
+      </div>
+      <div class="panel fact warn">
+        <h4><svg class="tk" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="var(--amber)" stroke-width="1.5"/><path d="M8 5v4M8 11h.01" stroke="var(--amber)" stroke-width="1.5" stroke-linecap="round"/></svg>
+          The topology is staged</h4>
+        <p>The demo uses synthetic data and runs the three parties plus control in a single account. That is a
+          functional demonstration of the protocol and the product — <b style="color:#ffd694">not</b> proof of
+          adversarial infrastructure isolation. Production splits each org into its own project and key material.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= AI COMPANY ======================= -->
+  <section>
+    <div class="sec-hd">
+      <span class="eyebrow">The company</span>
+      <h2>Phylax is a B2B trust-&amp;-safety company with real AI at its core.</h2>
+      <p class="lede">Not a chatbot wrapper. A containment consortium that banks, marketplaces, and messaging
+        platforms subscribe to — because coordinated fraud is a shared loss and, until now, an unshareable one.</p>
+    </div>
+
+    <div class="company">
+      <div class="panel paywall">
+        <div class="panel-hd"><span class="eyebrow">Who pays &amp; why</span><span class="tag">B2B · consortium</span></div>
+        <div class="panel-pad">
+          <div class="kv"><span class="k">Members</span><span class="v">banks · marketplaces · messengers</span></div>
+          <div class="kv"><span class="k">Pricing</span><span class="v">subscription + per-consortium</span></div>
+          <div class="kv"><span class="k">Value 1</span><span class="v">fraud-loss reduction</span></div>
+          <div class="kv"><span class="k">Value 2</span><span class="v">regulation-safe collaboration</span></div>
+          <div class="kv"><span class="k">Value 3</span><span class="v">faster coordinated takedown</span></div>
+          <p class="muted" style="font-size:12.5px;color:var(--faint);margin:14px 0 0;line-height:1.55">
+            The pitch to a compliance officer: prove the ring, cut the losses, and never once move a customer
+            record across an organizational boundary.</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-hd"><span class="eyebrow">Where the AI actually is</span><span class="tag cy">no chatbot</span></div>
+        <div class="panel-pad">
+          <div class="airow"><span class="t">MODEL</span><span class="d"><b>Federated risk model.</b> A trained
+            logistic regression scoring coordinated-campaign risk over privacy-preserving aggregate features.</span></div>
+          <div class="airow"><span class="t">AGENTS</span><span class="d"><b>Autonomous party agents.</b> Each org
+            runs a compute agent that performs its share of the PSI and secure aggregation, keys never leaving.</span></div>
+          <div class="airow"><span class="t">WORKFLOW</span><span class="d"><b>Agentic containment.</b> A
+            server-enforced state machine drives detection → match → score → approval → receipt end to end.</span></div>
+          <div class="nochat">// the intelligence is the model and the orchestration — not a text box</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ======================= CLOSING CTA ======================= -->
+<div class="wrap">
+  <section class="close">
+    <span class="eyebrow">See it run</span>
+    <h2>Watch three weak signals become one proven campaign.</h2>
+    <p class="lede">Open the operator console and run a protected sweep: three fragments in, one coordinated
+      ring out, zero raw records shared, one human approval before anything moves.</p>
+    <div class="cta">
+      <a class="btn btn-primary btn-lg" href="/console">Open the console</a>
+      <a class="btn btn-lg" href="/architecture">Read the architecture</a>
+    </div>
+  </section>
+</div>
+
+<footer class="foot">
+  <div class="in">
+    <span class="topo">synthetic / demo topology · real PSI + MPC · live InsForge control plane</span>
+    <span class="lk">
+      <a href="/console">Console</a>
+      <a href="/architecture">Architecture</a>
+      <a href="/sponsor">Sponsor</a>
+    </span>
+  </div>
+</footer>
+
+</body>
+</html>

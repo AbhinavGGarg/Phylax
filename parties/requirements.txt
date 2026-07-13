@@ -1,0 +1,9 @@
+# PHYLAX · party compute layer — runtime dependencies (stdlib DDH PSI backend).
+# Pinned to real, released versions (Dec 2024). Used by Dockerfile.party and
+# Dockerfile.coordinator. The pure-stdlib PSI/MPC core needs nothing beyond these
+# — numpy is only used offline by risk_model.verify_frozen()/tests, not at
+# inference (scoring is pure Python).
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+numpy==2.2.1
+pydantic==2.10.4
