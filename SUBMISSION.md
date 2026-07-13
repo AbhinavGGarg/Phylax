@@ -24,8 +24,8 @@ customer record, then coordinate the smallest human-approved intervention.
 > between organizations, hosts the long-running protected-compute services,
 > enforces access controls, persists the auditable decision ledger, streams the
 > live incident response, stores private artifacts, and deploys the control
-> plane. SecretFlow performs the privacy-preserving computation; InsForge makes
-> that computation a usable, trusted product.
+> plane. Phylax's own privacy-preserving computation runs on that foundation;
+> InsForge makes that computation a usable, trusted product.
 
 ## What's real
 
@@ -33,8 +33,8 @@ customer record, then coordinate the smallest human-approved intervention.
   14 tables, RLS on all, a server-enforced monotonic state machine, append-only
   audit ledger, 8 edge functions (all active), Realtime, and a private Storage bucket.
 - **Real privacy-preserving computation** — 2048-bit MODP DDH-PSI locally,
-  SecretFlow SPU `ECDH_PSI_3PC` in production; additive-secret-sharing secure
-  aggregation; a real trained logistic-regression risk model. No LLM anywhere.
+  a 1024-bit MODP group on the hosted edge; OPRF-keyed tokenization + additive-
+  secret-sharing secure aggregation; a real trained logistic-regression risk model. No LLM anywhere.
 - **26 passing tests** — crypto-core proofs + live-InsForge RLS/replay/state-machine/
   receipt/realtime-hygiene tests.
 - **Verified demo numbers** — 4 shared signatures, 99.98 % collective risk vs
@@ -67,4 +67,4 @@ services / require your identity:
    Suggested: `git init && git add . && git commit -m "Phylax" && git remote add origin <url> && git push -u origin main`.
 3. **Submit on Sublet** — https://sublet--saurabhskhire.replit.app/ before the deadline.
 4. *(Optional)* **Deploy the frontend to InsForge Sites** — `npx @insforge/cli deployments deploy web`.
-5. *(Optional)* **Deploy the SecretFlow party services to InsForge Custom Compute** — see `docs/deploy-compute.md`.
+5. *(Optional)* **Deploy the party compute services to InsForge Custom Compute** — see `docs/deploy-compute.md`.

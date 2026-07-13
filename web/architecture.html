@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Phylax · Architecture &amp; Security</title>
-<meta name="description" content="How Phylax keeps the boundary: InsForge as the neutral control plane, SecretFlow for the privacy-preserving computation, and only opaque commitments crossing the trust membrane."/>
+<meta name="description" content="How Phylax keeps the boundary: InsForge as the neutral control plane, Phylax's own party-side privacy-preserving computation, and only opaque commitments crossing the trust membrane."/>
 <link rel="stylesheet" href="/assets/phylax.css"/>
 <style>
   :root{ --maxw:1180px }
@@ -132,8 +132,8 @@
     <span class="eyebrow">Architecture &amp; security</span>
     <h1>How the boundary holds.</h1>
     <p class="lede">Phylax splits the world into partner spaces and one neutral control plane, separated by a
-      trust membrane. The privacy-preserving computation happens on the partner side, in SecretFlow. InsForge
-      is the neutral control plane that makes that computation a usable, auditable product. Only opaque
+      trust membrane. The privacy-preserving computation happens on the partner side, in Phylax's own
+      protected-compute agents. InsForge is the neutral control plane that makes that computation a usable, auditable product. Only opaque
       commitments, permitted aggregate findings, and hashes ever cross into the middle.</p>
   </section>
 
@@ -160,7 +160,7 @@
           <rect x="46" y="106" width="214" height="30" rx="7" class="dg-row"/>
           <text x="58" y="125" class="dg-mono dg-sub" font-size="11">local data · RLS · vectors (opt)</text>
           <rect x="46" y="144" width="214" height="30" rx="7" class="dg-row"/>
-          <text x="58" y="163" class="dg-mono dg-cy" font-size="11">party compute agent · SecretFlow</text>
+          <text x="58" y="163" class="dg-mono dg-cy" font-size="11">party compute agent · DDH-PSI</text>
         </g>
         <!-- SwiftCart -->
         <g>
@@ -170,7 +170,7 @@
           <rect x="46" y="295" width="214" height="30" rx="7" class="dg-row"/>
           <text x="58" y="314" class="dg-mono dg-sub" font-size="11">local data · RLS · vectors (opt)</text>
           <rect x="46" y="333" width="214" height="30" rx="7" class="dg-row"/>
-          <text x="58" y="352" class="dg-mono dg-cy" font-size="11">party compute agent · SecretFlow</text>
+          <text x="58" y="352" class="dg-mono dg-cy" font-size="11">party compute agent · DDH-PSI</text>
         </g>
         <!-- PingLine -->
         <g>
@@ -180,7 +180,7 @@
           <rect x="46" y="484" width="214" height="30" rx="7" class="dg-row"/>
           <text x="58" y="503" class="dg-mono dg-sub" font-size="11">local data · RLS · vectors (opt)</text>
           <rect x="46" y="522" width="214" height="30" rx="7" class="dg-row"/>
-          <text x="58" y="541" class="dg-mono dg-cy" font-size="11">party compute agent · SecretFlow</text>
+          <text x="58" y="541" class="dg-mono dg-cy" font-size="11">party compute agent · DDH-PSI</text>
         </g>
 
         <!-- ===== trust membrane ===== -->
@@ -284,7 +284,7 @@
         raw evidence itself.</dd>
 
       <dt>Custom Compute</dt>
-      <dd>Dockerized <b>SecretFlow party services</b> (Linux · Python&nbsp;3.10) run the long-lived
+      <dd>Dockerized <b>party compute services</b> (Linux · Python&nbsp;3.10) run the long-lived
         protected-compute agents beside each org's data, executing that party's share of the PSI and secure
         aggregation.</dd>
 
@@ -298,20 +298,20 @@
     </dl>
   </section>
 
-  <!-- ======================= SECRETFLOW FEATURE MAP ======================= -->
+  <!-- ======================= PRIVACY-PRESERVING COMPUTATION ======================= -->
   <section>
     <div class="sec-hd">
-      <span class="eyebrow">SecretFlow feature map</span>
+      <span class="eyebrow">Privacy-preserving computation</span>
       <h2>The privacy-preserving computation, on the party side.</h2>
-      <p class="lede">SecretFlow performs the cryptography; it never touches the neutral plane. What leaves a
+      <p class="lede">The cryptography runs on the party side; it never touches the neutral plane. What leaves a
         party is only what the protocol is designed to output.</p>
     </div>
 
     <dl class="fmap">
-      <dt>ECDH PSI</dt>
-      <dd><b>Private set intersection</b> across three parties —
-        <span class="mono">ECDH_PSI_3PC</span> (and <span class="mono">ECDH_PSI_2PC</span> for two), pinned to
-        <span class="mono">secretflow 1.10.0b1 / SPU 0.9.x</span>. The coordinator relays fully-blinded group
+      <dt>DDH PSI</dt>
+      <dd><b>Private set intersection</b> across three parties via multiparty commutative encryption in a
+        DDH-hard group — <span class="mono">2048-bit MODP</span> locally, a <span class="mono">1024-bit MODP</span>
+        group on the hosted edge. The coordinator relays fully-blinded group
         elements and learns only the intersection; non-matching tokens are never revealed.</dd>
 
       <dt>Secure aggregation</dt>
@@ -324,10 +324,10 @@
         five features (<span class="mono">distinct_parties, matched_signatures, total_events, mean_velocity_z,
         temporal_alignment</span>) — scores the matched cluster from those aggregates alone.</dd>
 
-      <dt>Local backend</dt>
-      <dd>A pure-stdlib <span class="mono">2048-bit MODP DDH-PSI</span> (RFC&nbsp;3526) implements the same
-        cryptographic family — commutative encryption in a DDH-hard group — for reproducibility and to run
-        anywhere. It yields identical results to the SecretFlow SPU backend.</dd>
+      <dt>Runs anywhere</dt>
+      <dd>The implementation is pure standard library — no native wheels — so the protected computation
+        reproduces on any machine and even runs inside the InsForge edge function itself, yielding identical
+        results in every backend.</dd>
     </dl>
   </section>
 
@@ -382,7 +382,7 @@
         <h4>Running now</h4>
         <ul>
           <li><svg class="ic" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--cyan)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            2048-bit MODP DDH-PSI executes locally; SecretFlow <span class="mono">ECDH_PSI_3PC</span> in production</li>
+            2048-bit MODP DDH-PSI locally; a 1024-bit MODP group inside the InsForge edge function</li>
           <li><svg class="ic" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--cyan)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Trained logistic-regression risk model — not an LLM, not a random score</li>
           <li><svg class="ic" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.2 3.2L13 5" stroke="var(--cyan)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
