@@ -1,135 +1,292 @@
-# PHYLAX — Bay Builders Demo Script
-# Target: Best Use of InsForge  |  2 min 30 sec
+# ═══════════════════════════════════════════════════════════════════════════
+# PHYLAX — BAY BUILDERS HACKATHON DEMO SCRIPT
+# Target: Best Use of InsForge  |  Duration: 2:30
+# Presenter: [Your Name]
+# ═══════════════════════════════════════════════════════════════════════════
+
+## ───── BEFORE YOU START ─────
+
+Open these tabs. Order matters.
+  1. http://localhost:8890          (landing)
+  2. http://localhost:8890/console  (login & run a test sweep beforehand)
+  3. http://localhost:8890/architecture
+  4. http://localhost:8890/sponsor
+
+- Server ON:  `npm run dev`
+- Browser:    Full screen, hide bookmarks bar
+- Font size:  Zoom so text is readable from the projector
+- Test sweep: Run it once so you know the timing
+- Have the partner tab ready just in case
 
 
-## ═══ SETUP ═══
+# ═══════════════════════════════════════════════════════════════════════════
+# THE SCRIPT
+# ═══════════════════════════════════════════════════════════════════════════
 
-Open these tabs before you start:
-- `/` (landing)
-- `/architecture`
-- `/console` 
-- `/sponsor`
-- Run the server: `npm run dev`
 
----
+## ───── 0:00 – 0:25 │ LANDING PAGE ─────
 
-## 0:00 – 0:20 │ THE HOOK │ Landing page
+[tab: landing  —  http://localhost:8890]
 
-"Scam rings win because platforms can't talk to each other.
+"Hey. I'm [name], and this is Phylax.
 
-A bank sees a payout spike. Point eight percent risk. Noise.
-A marketplace sees a shady seller. Point eight percent risk. Noise.
-A messenger sees a link burst. Two point eight percent risk. Noise.
+Here's the problem. Scam rings are cross-platform. A bank sees a weird
+payout. A marketplace sees a shady seller. A messaging app sees a link
+burst. Three fragments — each one, taken alone, is basically noise. The
+bank can't freeze the account. The marketplace can't ban the seller. The
+messenger can't block the link. Nobody has the full picture.
 
-Three platforms, three fragments — none can act alone.
+The obvious answer is: pool the data. But you can't. Customer identities,
+raw messages, account numbers, watchlists — sharing any of that is
+illegal, unsafe, or both. So the ring wins by default.
 
-And they can't pool the raw data. It's illegal. It'd be a privacy disaster.
+Phylax changes the game. We prove the campaign together — without sharing
+a single raw record."
 
-So the ring wins. Every time.
+[scroll down — point to the stats bar]
 
-We built something that changes that. It's called Phylax."
+"Three platforms co-observing. Four shared signatures found. And this
+number — zero raw records shared. That's not a UX trick. That zero is a
+hard database invariant. It's enforced by trigger. It will never move."
 
----
+[scroll to the pipeline section]
 
-## 0:20 – 0:50 │ HOW IT WORKS │ Architecture page
+"Here's how it works. Five steps. Each party computes its own signals
+locally — under its own row-level security. Those become opaque
+commitments under a jointly-governed key. Then real cryptography — ECDH
+private-set-intersection — finds the shared signatures without anyone
+ever seeing the raw tokens. A trained model scores the collective risk.
+And nothing executes without human approval. Every action needs a person
+at the target organization to sign off."
 
-"Here's the architecture.
 
-Three partners — FinTrust, SwiftCart, PingLine — each keeps their raw data inside their own walls. Row-level security. Their stuff, their control.
+## ───── 0:25 – 0:55 │ ARCHITECTURE PAGE ─────
 
-Between them and the neutral plane? A trust membrane.
+[tab: architecture  —  http://localhost:8890/architecture]
 
-Nothing raw crosses. Only opaque commitments and hashes. That zero in the middle — that's the number of raw records we've ever centralized. It's sealed. It's enforced by a database trigger. It will never move.
+"This page is where we show our work. And where InsForge becomes the story."
 
-The neutral plane — this whole thing — that's **InsForge**.
+[point to the SVG diagram]
 
-Not a database we plugged in. InsForge IS the control plane."
+"Three partner spaces on the left — FinTrust, SwiftCart, PingLine. Each
+one runs its own compute agent, on its own infrastructure. Their raw data
+never leaves.
 
----
+Then this blue dashed line — the trust membrane. Only opaque commitments,
+aggregate findings, and hashes cross this line. Nothing else. Never.
 
-## 0:50 – 1:15 │ INSFORGE FEATURE MAP │ Same page, scroll
+And the right side — the neutral control plane. This is InsForge. This
+whole box."
 
-"We use eight InsForge products. Here's what they do for us:
+[scroll to InsForge feature map]
 
-**Auth + RLS.** Six roles. A FinTrust user cannot read SwiftCart's data. Not hidden in the frontend — enforced at the database row level.
+"We use eight InsForge products. Not because we wanted to check boxes —
+because each one does a job that nothing else could do.
 
-**Postgres.** Our state machine — draft to receipted — lives in InsForge Postgres. You can't skip a step, even as admin. The trigger won't let you.
+**Auth + RLS.** Six roles across four organizations. And here's the thing —
+it's not cosmetic. A FinTrust analyst literally cannot read a SwiftCart
+batch. We proved this in tests. InsForge's Row-Level Security enforces it
+at the database level. You can't bypass it in the frontend because it's
+not a frontend rule.
 
-**Edge Functions.** Eight functions, that's our entire API. Every callback from the compute layer is HMAC-signed, timestamp-verified, AND checked against a nonce ledger. You can't replay an attack here.
+**Postgres.** Thirteen tables. But the important part is the state machine.
+Every detection run goes through a strict sequence — draft, awaiting
+parties, running, protected match, risk scored, awaiting approval,
+actioned, receipted. You cannot skip a step. You cannot go backwards. Even
+with the admin key. That's enforced by a Postgres trigger, and we proved
+it in tests by trying to make illegal transitions.
 
-**Realtime.** Live incident feed, gated by RLS. InsForge streams only safe metadata.
+**Edge Functions.** Eight functions form our entire API. The critical one is
+receive-worker-callback. When the compute layer finishes the private-set-
+intersection, it signs the result and sends it back. Our edge function
+verifies the HMAC-SHA256 signature, checks the timestamp is within a
+freshness window, and then consumes a single-use nonce from a dedicated
+ledger. That nonce can never be used again. Replay attacks are impossible —
+not because we think so, because InsForge's database makes it impossible.
 
-**Storage.** Private artifacts bucket. Signed receipts, model artifacts. The database only stores pointers — never evidence.
+**Realtime.** Live incident timeline. Payloads carry only safe metadata. No
+signals, no identifiers. And subscription is gated by RLS — only authorized
+viewers can subscribe.
 
-**Custom Compute.** Dockerized SecretFlow doing the private math. InsForge hosts it.
+**Storage.** Private bucket called phylax-artifacts. Signed receipts, model
+artifacts, run reports. The database stores only bucket keys and checksums.
+Never the raw contents.
 
-**Backend Branching.** Any schema change goes through a security branch first.
+**Custom Compute.** Dockerized SecretFlow party services running Python 3.10.
+Each org gets its own container for its share of the PSI and secure
+aggregation. InsForge hosts them.
 
-**Sites.** This whole frontend — deployed on InsForge.
+**Backend Branching.** Every schema change — RLS policy, trigger, function —
+goes through a security branch first. We can't accidentally break the
+trust boundary.
 
-We didn't integrate with InsForge. Our product IS InsForge spread across eight primitives."
+**Sites.** This entire frontend deploys on InsForge Sites from the same
+project that governs the data. One control plane, front to back."
 
----
+[scroll to SecretFlow section]
 
-## 1:15 – 1:50 │ LIVE DEMO │ Console page
+"Quick note on SecretFlow — it does the privacy-preserving computation.
+The ECDH private-set-intersection, the secure aggregation, the federated
+risk model. It never touches the neutral plane. But SecretFlow is a
+compute library. InsForge is what makes it a deployable, auditable,
+production-ready product."
 
-"Let me show you it running.
 
-[Click: Run Protected Sweep]
+## ───── 0:55 – 1:30 │ CONSOLE — LIVE DEMO ─────
 
-While this runs — watch the state machine. InsForge Postgres moves the run from draft to awaiting_parties to running. Every transition enforced. Every step on an append-only audit ledger.
+[tab: console  —  http://localhost:8890/console]
 
-The real cryptography happens now — ECDH private-set-intersection across three parties. SecretFlow does the math. But InsForge is the platform that makes it a product.
+"This is the operator console. I'm going to run a live protected sweep."
 
-The coordinator only sees the intersection. Non-matching tokens never leave their org. And every callback into the control plane passes through our edge functions — HMAC verified, nonce consumed, replay impossible.
+[point left panel]
 
-There it is. Four shared signatures. Three platforms. Ninety-nine point nine eight percent collective risk — versus sub-three percent solo. A proven campaign. And raw records shared? Still zero."
+"Left side — what each organization sees. FinTrust sees unusual payout
+velocity. Solo risk: 0.77%. Below any action threshold. SwiftCart sees
+off-platform steering. 0.82%. PingLine sees a link burst. 2.79%. Each
+one alone — noise."
 
----
+[point to the zero counter at the top]
 
-## 1:50 – 2:15 │ THE THESIS │ Sponsor page
+"That zero — raw records shared — never moves. I want you to watch it
+through this whole demo."
 
-"Read this line. This is the whole pitch.
+[click: Run Protected Sweep]
 
-Phylax is built natively on InsForge. InsForge creates the trust boundaries. Hosts the compute. Enforces access controls. Persists the ledger. Streams the incident response. Stores artifacts. Deploys the frontend.
+"Here we go. Watch the timeline on the right. Run created. Parties
+dispatched. Now three party agents go ready — FinTrust, SwiftCart,
+PingLine. The green rings on the graph show their status."
 
-SecretFlow does the private math. InsForge makes that math a usable, trusted, deployable product.
+"Protected session established. The encrypted match runs now — ECDH
+private-set-intersection across all three parties. The coordinator sees
+the intersection only. Non-matching tokens are hidden by the DDH
+assumption."
 
-Without InsForge, this is a crypto whitepaper. With InsForge, banks and platforms can actually run this. InsForge is not a backend we added afterwards — it's the reason this works at all."
+"You can see the graph update live. The node states change. Packets move
+across the trust membrane. The sealed zero holds."
 
----
+"Protected match complete. Campaign proven. Four shared signatures across
+three platforms. The crimson arcs appear — these are the coordination
+links that were invisible before."
 
-## 2:15 – 2:30 │ THE CLOSE │ Landing page
+"And here's the score: 99.98% collective risk. Versus under 3% solo. The
+model's feature drivers show you why — total events, mean velocity,
+temporal alignment. A real logistic regression, not a random number. Not
+an LLM."
 
-"To the InsForge team — we didn't name-drop you. Every security boundary in Phylax is an InsForge policy. Every incident runs through an InsForge state machine. Every receipt lives in an InsForge bucket.
+"Now the state machine moves to awaiting approval. Human required. Nothing
+auto-executes. Hold payout. Quarantine listing. Warn recipients. Each
+action needs a human at the target org to sign off."
 
-We're competing for Best Use of InsForge because our product doesn't work without it. Literally.
+"Receipt issued and verified. The signed receipt is in InsForge's storage
+bucket. The audit trail is immutable — append-only ledger, every step
+recorded."
 
-Phylax. Prove the campaign. Share nothing. Built on InsForge."
+"And that zero? Still zero. It's been zero this whole time."
 
----
 
-## ═══ CHEAT SHEET ═══
+## ───── 1:30 – 2:00 │ SPONSOR PAGE ─────
 
-**Tabs:** `/` → `/architecture` → `/console` → `/sponsor` → `/`
+[tab: sponsor  —  http://localhost:8890/sponsor]
 
-**Before stage:**
-- Run `npm run dev`
-- Pre-load all 4 tabs
-- Test sweep once
+"Let me show you the page we made specifically for the InsForge judges."
 
-**8 InsForge mentions checklist:**
-- Auth + RLS
-- Postgres (state machine, trigger)
-- Edge Functions (HMAC, nonce)
-- Realtime (RLS-gated)
-- Storage (pointers only)
-- Custom Compute (Docker)
-- Backend Branching
-- Sites (deploy)
+[point to the thesis statement]
 
-**Key phrases to remember:**
-- "The product IS InsForge"
-- "We didn't integrate — the product IS InsForge spread across eight primitives"
-- "Without InsForge, this is a crypto whitepaper"
-- "InsForge makes that math a product"
+"This is the thesis. Read it — actually read it.
+
+Phylax is built natively on InsForge. InsForge creates the trust
+boundaries between organizations. Hosts the long-running protected-
+compute services. Enforces access controls. Persists the auditable
+decision ledger. Streams the live incident response. Stores private
+artifacts. Deploys the control plane.
+
+SecretFlow performs the privacy-preserving computation. InsForge makes
+that computation a usable, trusted product.
+
+That last line is the whole thing. SecretFlow is a math library — an
+incredible one. But math doesn't ship. Math doesn't authenticate. Math
+doesn't audit. Math doesn't stream. Without InsForge, this project is
+a cryptography demo. With InsForge, it's a product that a bank compliance
+officer could actually deploy."
+
+[scroll to the table]
+
+"Every InsForge primitive, mapped to a containment function. Auth creates
+the trust boundaries. Postgres persists the decision ledger. Edge
+Functions drive the workflow. Custom Compute hosts the party agents.
+Realtime streams the incident. Storage holds the artifacts. Branching
+guards the schema. Sites deploys the surface."
+
+"One platform, one project, one control plane. We didn't wire eight
+services together. InsForge IS the stack."
+
+[scroll to hackathon tracks]
+
+"We're submitting for Track 1 — AI SaaS, B2B. Phylax is a subscription
+trust-and-safety product for a consortium of banks, marketplaces, and
+messaging platforms. It's also compatible with Track 3 — AI Agent Company
+— because our party agents run autonomously. And Track 4 — Vertical AI —
+because we go deep on financial crime. But the prize we really want is
+Best Use of InsForge."
+
+
+## ───── 2:00 – 2:30 │ CLOSE ─────
+
+[tab: back to landing  —  http://localhost:8890]
+
+"So here's what we built.
+
+A privacy-preserving, real-time collective campaign containment network.
+Three platforms prove a coordinated ring exists without sharing customer
+identities, raw messages, bank account numbers, watchlists, or embeddings.
+
+We run real cryptography — not a loading spinner. Private set intersection
+and secure aggregation execute for real. The risk model is a trained
+logistic regression, not a random number, not an LLM. The zero is a hard
+database invariant, enforced by trigger.
+
+And it all runs on InsForge. Every security boundary. Every state
+transition. Every live event. Every sealed receipt. Every deployed page.
+
+To the InsForge team — we didn't use InsForge as a database. We used it
+as the operating system for an AI security company.
+
+Phylax. Prove the campaign. Share nothing. Built on InsForge.
+
+Thank you."
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CHEAT SHEET
+# ═══════════════════════════════════════════════════════════════════════════
+
+# TAB ORDER:
+#   Landing  →  Architecture  →  Console  →  Sponsor  →  Landing
+
+# INSFORGE CHECKLIST (hit all 8):
+#   □ Auth + RLS         "enforced at the database row level"
+#   □ Postgres           "state machine, trigger-enforced, illegal jumps rejected"
+#   □ Edge Functions     "HMAC-SHA256, timestamp window, single-use nonce ledger"
+#   □ Realtime           "RLS-gated subscriptions, safe metadata only"
+#   □ Storage            "private bucket, pointers + checksums, never raw evidence"
+#   □ Custom Compute     "Dockerized SecretFlow, Linux + Python 3.10"
+#   □ Backend Branching  "schema-only security branch, can't break the boundary"
+#   □ Sites              "frontend deploys from the same project"
+
+# KEY LINES TO MEMORIZE:
+#   "The product IS InsForge"
+#   "InsForge makes that computation a usable, trusted product"
+#   "Without InsForge this is a crypto whitepaper"
+#   "That zero is a hard database invariant — enforced by trigger"
+#   "We didn't wire eight services together — InsForge IS the stack"
+#   "Not because we think so — because InsForge's database makes it impossible"
+
+# IF YOU RUN SHORT ON TIME:
+#   - Speed up the InsForge feature map (hit Auth, Postgres, Edge Fns, skip rest)
+#   - Skip SecretFlow section entirely
+#   - Shorten the console demo by pre-running the sweep and showing the result
+
+# IF YOU HAVE EXTRA TIME:
+#   - Show partner page to prove RLS isolation
+#   - Show the architecture checklist (what's real vs staged)
+#   - Talk about the 26 passing tests
